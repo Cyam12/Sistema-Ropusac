@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>{% block title %}ROPUSAC{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
@@ -39,10 +39,10 @@
 
                 {% if current_user.rol_nombre == 'logistica' %}
                     <a href="{{ url_for('logistica.dashboard') }}">Dashboard</a>
-                    <a href="#">Productos</a>
-                    <a href="#">Proveedores</a>
-                    <a href="#">Costos</a>
-                    <a href="#">Disponibilidad</a>
+                    <a href="{{ url_for('logistica.productos') }}">Productos</a>
+                    <a href="{{ url_for('logistica.proveedores') }}">Proveedores</a>
+                    <a href="{{ url_for('logistica.costos') }}">Costos</a>
+                    <a href="{{ url_for('logistica.disponibilidad') }}">Disponibilidad</a>
                 {% endif %}
             </nav>
 

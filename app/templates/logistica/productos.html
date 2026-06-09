@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Productos | ROPUSAC{% endblock %}
+
+{% block page_title %}Gestión de Productos{% endblock %}
+
+{% block page_subtitle %}
+Administra productos, stock, categorías y precios sugeridos.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Productos registrados</h3>
+            <p>Listado general de productos del sistema.</p>
+        </div>
+
+        <a href="{{ url_for('logistica.nuevo_producto') }}" class="btn-primary">
+            Nuevo producto
+        </a>
+    </div>
+
+    <form method="GET" action="{{ url_for('logistica.productos') }}" class="form-grid filter-grid">
+
+        <div class="form-group">
+            <label>Buscar producto</label>
+            <input 
+                type="text" 
+                name="buscar"
+                placeholder="Código, producto, marca, modelo o categoría"
+                value="{{ filtros.buscar }}"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Categoría</label>
+            <select name="categoria_id">
+                <option value="">Todas</option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}" {% if filtros.categoria_id|int == categoria.id %}selected{% endif %}>
+                        {{ categoria.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Stock</label>
+            <select name="stock">
+                <option value="">Todos</option>
+                <option value="disponible" {% if filtros.stock == 'disponible' %}selected{% endif %}>Disponible</option>
+                <option value="bajo" {% if filtros.stock == 'bajo' %}selected{% endif %}>Stock bajo</option>
+                <option value="agotado" {% if filtros.stock == 'agotado' %}selected{% endif %}>Agotado</option>
+            </select>
+        </div>
+
+        <div class="form-actions filter-actions">
+            <button type="submit" class="btn-primary">
+                Filtrar
+            </button>
+
+            <a href="{{ url_for('logistica.productos') }}" class="btn-secondary">
+                Limpiar
+            </a>
+        </div>
+
+    </form>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Unidad</th>
+                    <th>Precio venta</th>
+                    <th>Menor costo</th>
+                    <th>Stock</th>
+                    <th>Proveedores</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if productos %}
+                    {% for producto in productos %}
+                        <tr>
+                            <td>{{ producto.id }}</td>
+
+                            <td>
+                                <strong>{{ producto.codigo }}</strong>
+                            </td>
+
+                            <td>
+                                <strong>{{ producto.nombre }}</strong>
+
+                                {% if producto.marca or producto.modelo %}
+                                    <br>
+                                    <span class="text-muted">
+                                        {{ producto.marca or '' }} {{ producto.modelo or '' }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ producto.categoria or '-' }}</td>
+                            <td>{{ producto.unidad or '-' }}</td>
+                            <td>S/ {{ "%.2f"|format(producto.precio_venta_sugerido) }}</td>
+
+                            <td>
+                                {% if producto.menor_costo %}
+                                    S/ {{ "%.2f"|format(producto.menor_costo) }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ "%.2f"|format(producto.stock_actual) }}
+
+                                {% if producto.stock_actual == 0 %}
+                                    <br>
+                                    <span class="badge badge-danger">Agotado</span>
+                                {% elif producto.stock_actual <= producto.stock_minimo %}
+                                    <br>
+                                    <span class="badge badge-warning">Stock bajo</span>
+                                {% else %}
+                                    <br>
+                                    <span class="badge badge-success">Disponible</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ producto.total_proveedores }}</td>
+
+                            <td>
+                                {% if producto.estado == 'activo' %}
+                                    <span class="badge badge-success">Activo</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Inactivo</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="table-actions">
+                                    <a href="{{ url_for('logistica.editar_producto', producto_id=producto.id) }}" class="btn-small">
+                                        Editar
+                                    </a>
+
+                                    <form method="POST"
+                                          action="{{ url_for('logistica.eliminar_producto', producto_id=producto.id) }}"
+                                          class="inline-form"
+                                          onsubmit="return confirm('¿Seguro que deseas eliminar este producto? Si tiene proveedores o cotizaciones, será marcado como inactivo.');">
+                                        <button type="submit" class="btn-small btn-danger">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="11" class="text-center">
+                            No hay productos registrados.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

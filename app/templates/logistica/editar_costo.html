@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Costo | ROPUSAC{% endblock %}
+
+{% block page_title %}Editar Costo{% endblock %}
+
+{% block page_subtitle %}
+Actualiza costo, disponibilidad y tiempo de entrega del proveedor.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Editar costo</h3>
+            <p>Modifica la relación producto-proveedor seleccionada.</p>
+        </div>
+
+        <a href="{{ url_for('logistica.costos') }}" class="btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <form method="POST" action="{{ url_for('logistica.editar_costo', costo_id=costo.id) }}" class="form-grid">
+
+        <div class="form-group">
+            <label>Producto *</label>
+            <select name="producto_id" required>
+                <option value="">Seleccionar producto</option>
+                {% for producto in productos %}
+                    <option value="{{ producto.id }}" {% if costo.producto_id == producto.id %}selected{% endif %}>
+                        {{ producto.codigo }} - {{ producto.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Proveedor *</label>
+            <select name="proveedor_id" required>
+                <option value="">Seleccionar proveedor</option>
+                {% for proveedor in proveedores %}
+                    <option value="{{ proveedor.id }}" {% if costo.proveedor_id == proveedor.id %}selected{% endif %}>
+                        {{ proveedor.razon_social }} - {{ proveedor.ruc or 'Sin RUC' }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Código del proveedor</label>
+            <input 
+                type="text" 
+                name="codigo_proveedor"
+                value="{{ costo.codigo_proveedor or '' }}"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Costo unitario *</label>
+            <input 
+                type="number" 
+                name="costo_unitario" 
+                step="0.01" 
+                min="0" 
+                value="{{ costo.costo_unitario }}"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Disponibilidad *</label>
+            <select name="disponibilidad" required>
+                <option value="disponible" {% if costo.disponibilidad == 'disponible' %}selected{% endif %}>Disponible</option>
+                <option value="bajo_stock" {% if costo.disponibilidad == 'bajo_stock' %}selected{% endif %}>Bajo stock</option>
+                <option value="agotado" {% if costo.disponibilidad == 'agotado' %}selected{% endif %}>Agotado</option>
+                <option value="por_confirmar" {% if costo.disponibilidad == 'por_confirmar' %}selected{% endif %}>Por confirmar</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tiempo de entrega</label>
+            <input 
+                type="number" 
+                name="tiempo_entrega_dias" 
+                min="0" 
+                value="{{ costo.tiempo_entrega_dias or 0 }}"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Estado *</label>
+            <select name="estado" required>
+                <option value="activo" {% if costo.estado == 'activo' %}selected{% endif %}>Activo</option>
+                <option value="inactivo" {% if costo.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Observación</label>
+            <textarea name="observacion" rows="4">{{ costo.observacion or '' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                Actualizar costo
+            </button>
+
+            <a href="{{ url_for('logistica.costos') }}" class="btn-secondary">
+                Cancelar
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

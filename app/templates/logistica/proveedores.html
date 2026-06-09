@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Proveedores | ROPUSAC{% endblock %}
+
+{% block page_title %}Gestión de Proveedores{% endblock %}
+
+{% block page_subtitle %}
+Administra proveedores para mantener actualizados costos, contactos y disponibilidad.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Proveedores registrados</h3>
+            <p>Listado general de proveedores disponibles para compras y costos.</p>
+        </div>
+
+        <a href="{{ url_for('logistica.nuevo_proveedor') }}" class="btn-primary">
+            Nuevo proveedor
+        </a>
+    </div>
+
+    <form method="GET" action="{{ url_for('logistica.proveedores') }}" class="search-form">
+        <input 
+            type="text" 
+            name="buscar" 
+            placeholder="Buscar por RUC, razón social, correo o teléfono"
+            value="{{ buscar }}"
+        >
+
+        <button type="submit" class="btn-primary">Buscar</button>
+
+        {% if buscar %}
+            <a href="{{ url_for('logistica.proveedores') }}" class="btn-secondary">
+                Limpiar
+            </a>
+        {% endif %}
+    </form>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>RUC</th>
+                    <th>Proveedor</th>
+                    <th>Contacto</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                    <th>Ubicación</th>
+                    <th>Productos asociados</th>
+                    <th>Estado</th>
+                    <th>Registrado por</th>
+                    <th>Fecha registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if proveedores %}
+                    {% for proveedor in proveedores %}
+                        <tr>
+                            <td>{{ proveedor.id }}</td>
+
+                            <td>{{ proveedor.ruc or '-' }}</td>
+
+                            <td>
+                                <strong>{{ proveedor.razon_social }}</strong>
+
+                                {% if proveedor.nombre_comercial %}
+                                    <br>
+                                    <span class="text-muted">
+                                        {{ proveedor.nombre_comercial }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ proveedor.contacto or '-' }}</td>
+                            <td>{{ proveedor.telefono or '-' }}</td>
+                            <td>{{ proveedor.email or '-' }}</td>
+
+                            <td>
+                                {% if proveedor.distrito or proveedor.provincia or proveedor.departamento %}
+                                    {{ proveedor.distrito or '' }}
+                                    {{ proveedor.provincia or '' }}
+                                    {{ proveedor.departamento or '' }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>{{ proveedor.productos_asociados }}</td>
+
+                            <td>
+                                {% if proveedor.estado == 'activo' %}
+                                    <span class="badge badge-success">Activo</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Inactivo</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ proveedor.creado_por_nombre or '-' }}</td>
+                            <td>{{ proveedor.created_at }}</td>
+
+                            <td>
+                                <div class="table-actions">
+                                    <a href="{{ url_for('logistica.editar_proveedor', proveedor_id=proveedor.id) }}" class="btn-small">
+                                        Editar
+                                    </a>
+
+                                    <form method="POST"
+                                          action="{{ url_for('logistica.eliminar_proveedor', proveedor_id=proveedor.id) }}"
+                                          class="inline-form"
+                                          onsubmit="return confirm('¿Seguro que deseas eliminar este proveedor? Si tiene productos o cotizaciones asociadas, será marcado como inactivo.');">
+                                        <button type="submit" class="btn-small btn-danger">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="12" class="text-center">
+                            No hay proveedores registrados.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

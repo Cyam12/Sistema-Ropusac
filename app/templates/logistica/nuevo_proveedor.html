@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Proveedor | ROPUSAC{% endblock %}
+
+{% block page_title %}Nuevo Proveedor{% endblock %}
+
+{% block page_subtitle %}
+Registra proveedores para asociarlos a productos, costos y disponibilidad.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Registrar proveedor</h3>
+            <p>Completa la información comercial del proveedor.</p>
+        </div>
+
+        <a href="{{ url_for('logistica.proveedores') }}" class="btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <form method="POST" action="{{ url_for('logistica.nuevo_proveedor') }}" class="form-grid">
+
+        <div class="form-group">
+            <label>RUC</label>
+            <input type="text" name="ruc">
+        </div>
+
+        <div class="form-group">
+            <label>Razón social *</label>
+            <input type="text" name="razon_social" required>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre comercial</label>
+            <input type="text" name="nombre_comercial">
+        </div>
+
+        <div class="form-group">
+            <label>Contacto</label>
+            <input type="text" name="contacto">
+        </div>
+
+        <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" name="telefono">
+        </div>
+
+        <div class="form-group">
+            <label>Correo electrónico</label>
+            <input type="email" name="email">
+        </div>
+
+        <div class="form-group">
+            <label>Estado *</label>
+            <select name="estado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Dirección</label>
+            <input type="text" name="direccion">
+        </div>
+
+        <div class="form-group">
+            <label>Distrito</label>
+            <input type="text" name="distrito">
+        </div>
+
+        <div class="form-group">
+            <label>Provincia</label>
+            <input type="text" name="provincia">
+        </div>
+
+        <div class="form-group">
+            <label>Departamento</label>
+            <input type="text" name="departamento">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Guardar proveedor</button>
+            <a href="{{ url_for('logistica.proveedores') }}" class="btn-secondary">Cancelar</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

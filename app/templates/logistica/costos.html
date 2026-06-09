@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Costos | ROPUSAC{% endblock %}
+
+{% block page_title %}Gestión de Costos{% endblock %}
+
+{% block page_subtitle %}
+Administra costos por proveedor para calcular márgenes en las cotizaciones.
+{% endblock %}
+
+{% block content %}
+
+<div class="cards-grid">
+
+    <div class="card">
+        <span>Total costos</span>
+        <h2>{{ resumen.total_costos }}</h2>
+        <p>Relaciones producto-proveedor</p>
+    </div>
+
+    <div class="card">
+        <span>Costos activos</span>
+        <h2>{{ resumen.costos_activos }}</h2>
+        <p>Costos disponibles para cotizar</p>
+    </div>
+
+    <div class="card">
+        <span>Disponibles</span>
+        <h2>{{ resumen.disponibles }}</h2>
+        <p>Productos disponibles por proveedor</p>
+    </div>
+
+    <div class="card">
+        <span>Bajo stock</span>
+        <h2>{{ resumen.bajo_stock }}</h2>
+        <p>Disponibilidad limitada</p>
+    </div>
+
+    <div class="card">
+        <span>Agotados</span>
+        <h2>{{ resumen.agotados }}</h2>
+        <p>Sin disponibilidad actual</p>
+    </div>
+
+    <div class="card">
+        <span>Por confirmar</span>
+        <h2>{{ resumen.por_confirmar }}</h2>
+        <p>Pendientes de validar</p>
+    </div>
+
+</div>
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Costos registrados</h3>
+            <p>Listado de costos asociados a productos y proveedores.</p>
+        </div>
+
+        <a href="{{ url_for('logistica.nuevo_costo') }}" class="btn-primary">
+            Nuevo costo
+        </a>
+    </div>
+
+    <form method="GET" action="{{ url_for('logistica.costos') }}" class="form-grid filter-grid">
+
+        <div class="form-group">
+            <label>Buscar</label>
+            <input 
+                type="text" 
+                name="buscar"
+                placeholder="Producto, código, proveedor, RUC o código proveedor"
+                value="{{ filtros.buscar }}"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Producto</label>
+            <select name="producto_id">
+                <option value="">Todos</option>
+                {% for producto in productos %}
+                    <option value="{{ producto.id }}" {% if filtros.producto_id|int == producto.id %}selected{% endif %}>
+                        {{ producto.codigo }} - {{ producto.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Proveedor</label>
+            <select name="proveedor_id">
+                <option value="">Todos</option>
+                {% for proveedor in proveedores %}
+                    <option value="{{ proveedor.id }}" {% if filtros.proveedor_id|int == proveedor.id %}selected{% endif %}>
+                        {{ proveedor.razon_social }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Disponibilidad</label>
+            <select name="disponibilidad">
+                <option value="">Todas</option>
+                <option value="disponible" {% if filtros.disponibilidad == 'disponible' %}selected{% endif %}>Disponible</option>
+                <option value="bajo_stock" {% if filtros.disponibilidad == 'bajo_stock' %}selected{% endif %}>Bajo stock</option>
+                <option value="agotado" {% if filtros.disponibilidad == 'agotado' %}selected{% endif %}>Agotado</option>
+                <option value="por_confirmar" {% if filtros.disponibilidad == 'por_confirmar' %}selected{% endif %}>Por confirmar</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Estado</label>
+            <select name="estado">
+                <option value="">Todos</option>
+                <option value="activo" {% if filtros.estado == 'activo' %}selected{% endif %}>Activo</option>
+                <option value="inactivo" {% if filtros.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+            </select>
+        </div>
+
+        <div class="form-actions filter-actions">
+            <button type="submit" class="btn-primary">Filtrar</button>
+            <a href="{{ url_for('logistica.costos') }}" class="btn-secondary">Limpiar</a>
+        </div>
+
+    </form>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Producto</th>
+                    <th>Proveedor</th>
+                    <th>Código proveedor</th>
+                    <th>Costo unitario</th>
+                    <th>Precio venta</th>
+                    <th>Margen estimado</th>
+                    <th>Disponibilidad</th>
+                    <th>Entrega</th>
+                    <th>Actualización</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if costos %}
+                    {% for costo in costos %}
+                        <tr>
+                            <td>{{ costo.id }}</td>
+
+                            <td>
+                                <strong>{{ costo.codigo_producto }}</strong><br>
+                                {{ costo.producto }}
+
+                                {% if costo.marca or costo.modelo %}
+                                    <br>
+                                    <span class="text-muted">
+                                        {{ costo.marca or '' }} {{ costo.modelo or '' }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <strong>{{ costo.proveedor }}</strong><br>
+                                <span class="text-muted">
+                                    RUC: {{ costo.ruc_proveedor or '-' }}
+                                </span>
+                            </td>
+
+                            <td>{{ costo.codigo_proveedor or '-' }}</td>
+
+                            <td>
+                                <strong>S/ {{ "%.2f"|format(costo.costo_unitario) }}</strong>
+                            </td>
+
+                            <td>
+                                S/ {{ "%.2f"|format(costo.precio_venta_sugerido) }}
+                            </td>
+
+                            <td>
+                                S/ {{ "%.2f"|format(costo.margen_estimado) }}
+                                <br>
+                                <span class="text-muted">
+                                    {{ "%.2f"|format(costo.margen_porcentaje_estimado) }}%
+                                </span>
+                            </td>
+
+                            <td>
+                                {% if costo.disponibilidad == 'disponible' %}
+                                    <span class="badge badge-success">Disponible</span>
+                                {% elif costo.disponibilidad == 'bajo_stock' %}
+                                    <span class="badge badge-warning">Bajo stock</span>
+                                {% elif costo.disponibilidad == 'agotado' %}
+                                    <span class="badge badge-danger">Agotado</span>
+                                {% else %}
+                                    <span class="badge badge-info">Por confirmar</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ costo.tiempo_entrega_dias }} días</td>
+                            <td>{{ costo.fecha_actualizacion or '-' }}</td>
+
+                            <td>
+                                {% if costo.estado == 'activo' %}
+                                    <span class="badge badge-success">Activo</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Inactivo</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="table-actions">
+                                    <a href="{{ url_for('logistica.editar_costo', costo_id=costo.id) }}" class="btn-small">
+                                        Editar
+                                    </a>
+
+                                    <form method="POST"
+                                          action="{{ url_for('logistica.eliminar_costo', costo_id=costo.id) }}"
+                                          class="inline-form"
+                                          onsubmit="return confirm('¿Seguro que deseas eliminar este costo? Si ya fue usado en cotizaciones, será marcado como inactivo.');">
+                                        <button type="submit" class="btn-small btn-danger">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="12" class="text-center">
+                            No hay costos registrados con los filtros seleccionados.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

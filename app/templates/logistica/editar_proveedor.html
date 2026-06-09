@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Proveedor | ROPUSAC{% endblock %}
+
+{% block page_title %}Editar Proveedor{% endblock %}
+
+{% block page_subtitle %}
+Actualiza los datos comerciales y de contacto del proveedor.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Editar proveedor</h3>
+            <p>Modifica la información del proveedor seleccionado.</p>
+        </div>
+
+        <a href="{{ url_for('logistica.proveedores') }}" class="btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <form method="POST" action="{{ url_for('logistica.editar_proveedor', proveedor_id=proveedor.id) }}" class="form-grid">
+
+        <div class="form-group">
+            <label>RUC</label>
+            <input type="text" name="ruc" value="{{ proveedor.ruc or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Razón social *</label>
+            <input type="text" name="razon_social" value="{{ proveedor.razon_social }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre comercial</label>
+            <input type="text" name="nombre_comercial" value="{{ proveedor.nombre_comercial or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Contacto</label>
+            <input type="text" name="contacto" value="{{ proveedor.contacto or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" name="telefono" value="{{ proveedor.telefono or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Correo electrónico</label>
+            <input type="email" name="email" value="{{ proveedor.email or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Estado *</label>
+            <select name="estado" required>
+                <option value="activo" {% if proveedor.estado == 'activo' %}selected{% endif %}>Activo</option>
+                <option value="inactivo" {% if proveedor.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Dirección</label>
+            <input type="text" name="direccion" value="{{ proveedor.direccion or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Distrito</label>
+            <input type="text" name="distrito" value="{{ proveedor.distrito or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Provincia</label>
+            <input type="text" name="provincia" value="{{ proveedor.provincia or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Departamento</label>
+            <input type="text" name="departamento" value="{{ proveedor.departamento or '' }}">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Actualizar proveedor</button>
+            <a href="{{ url_for('logistica.proveedores') }}" class="btn-secondary">Cancelar</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

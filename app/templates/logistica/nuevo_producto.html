@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Producto | ROPUSAC{% endblock %}
+
+{% block page_title %}Nuevo Producto{% endblock %}
+
+{% block page_subtitle %}
+Registra productos para el catálogo comercial.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Registrar producto</h3>
+            <p>Completa los datos principales del producto.</p>
+        </div>
+
+        <a href="{{ url_for('logistica.productos') }}" class="btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <form method="POST" action="{{ url_for('logistica.nuevo_producto') }}" class="form-grid">
+
+        <div class="form-group">
+            <label>Categoría</label>
+            <select name="categoria_id">
+                <option value="">Sin categoría</option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Unidad de medida</label>
+            <select name="unidad_id">
+                <option value="">Sin unidad</option>
+                {% for unidad in unidades %}
+                    <option value="{{ unidad.id }}">
+                        {{ unidad.nombre }} - {{ unidad.abreviatura }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Código *</label>
+            <input type="text" name="codigo" required>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre del producto *</label>
+            <input type="text" name="nombre" required>
+        </div>
+
+        <div class="form-group">
+            <label>Marca</label>
+            <input type="text" name="marca">
+        </div>
+
+        <div class="form-group">
+            <label>Modelo</label>
+            <input type="text" name="modelo">
+        </div>
+
+        <div class="form-group">
+            <label>Precio venta sugerido *</label>
+            <input type="number" name="precio_venta_sugerido" step="0.01" min="0" value="0.00" required>
+        </div>
+
+        <div class="form-group">
+            <label>Stock actual *</label>
+            <input type="number" name="stock_actual" step="0.01" min="0" value="0.00" required>
+        </div>
+
+        <div class="form-group">
+            <label>Stock mínimo *</label>
+            <input type="number" name="stock_minimo" step="0.01" min="0" value="0.00" required>
+        </div>
+
+        <div class="form-group">
+            <label>Estado *</label>
+            <select name="estado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Descripción</label>
+            <textarea name="descripcion" rows="4"></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Guardar producto</button>
+            <a href="{{ url_for('logistica.productos') }}" class="btn-secondary">Cancelar</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

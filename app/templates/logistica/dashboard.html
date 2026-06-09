@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Logística{% endblock %}
+
+{% block page_title %}Dashboard Logística{% endblock %}
+
+{% block page_subtitle %}
+Panel para gestionar productos, proveedores, costos y disponibilidad.
+{% endblock %}
+
+{% block content %}
+
+<div class="cards-grid">
+
+    <div class="card">
+        <span>Productos activos</span>
+        <h2>{{ metricas.productos_activos }}</h2>
+        <p>Productos disponibles en catálogo</p>
+    </div>
+
+    <div class="card">
+        <span>Stock bajo</span>
+        <h2>{{ metricas.productos_stock_bajo }}</h2>
+        <p>Productos cerca del mínimo</p>
+    </div>
+
+    <div class="card">
+        <span>Agotados</span>
+        <h2>{{ metricas.productos_agotados }}</h2>
+        <p>Productos sin stock actual</p>
+    </div>
+
+    <div class="card">
+        <span>Proveedores activos</span>
+        <h2>{{ metricas.proveedores_activos }}</h2>
+        <p>Proveedores disponibles</p>
+    </div>
+
+    <div class="card">
+        <span>Costos registrados</span>
+        <h2>{{ metricas.costos_registrados }}</h2>
+        <p>Relaciones producto-proveedor</p>
+    </div>
+
+    <div class="card">
+        <span>Por confirmar</span>
+        <h2>{{ metricas.costos_por_confirmar }}</h2>
+        <p>Costos o disponibilidad pendientes</p>
+    </div>
+
+</div>
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Acciones rápidas</h3>
+            <p>Operaciones principales del área de logística y compras.</p>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <a href="{{ url_for('logistica.productos') }}">Gestionar productos</a>
+        <a href="{{ url_for('logistica.proveedores') }}">Gestionar proveedores</a>
+        <a href="{{ url_for('logistica.costos') }}">Actualizar costos</a>
+        <a href="{{ url_for('logistica.disponibilidad') }}">Ver disponibilidad</a>
+    </div>
+
+</div>
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Resumen del módulo logística</h3>
+            <p>Desde este panel podrás mantener actualizado el catálogo comercial.</p>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+
+        <div class="detail-box">
+            <span>Productos</span>
+            <strong>Registro y control</strong>
+            <p>Administra productos, categorías, unidades y stock.</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Proveedores</span>
+            <strong>Gestión comercial</strong>
+            <p>Registra proveedores y datos de contacto.</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Costos</span>
+            <strong>Precios de compra</strong>
+            <p>Actualiza costos por proveedor para calcular márgenes.</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Disponibilidad</span>
+            <strong>Validación operativa</strong>
+            <p>Controla stock, tiempos de entrega y disponibilidad.</p>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

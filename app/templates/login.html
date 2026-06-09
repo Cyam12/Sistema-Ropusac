@@ -2,142 +2,466 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Login | ROPUSAC</title>
+    <title>ROPUSAC</title>
+    <link rel="icon" type="image/png" href="/static/img/logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f3f6f9;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #ffffff;
+            color: #111827;
+        }
+
+        .login-wrapper {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1.45fr 1fr;
+        }
+
+        .login-brand {
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.16), transparent 18%),
+                linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 42%, #0f766e 100%);
+            color: #ffffff;
+            padding: 70px 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .login-brand::before {
+            content: "";
+            position: absolute;
+            width: 780px;
+            height: 780px;
+            border: 2px solid rgba(255, 255, 255, 0.10);
+            border-radius: 50%;
+            right: -360px;
+            top: 60px;
+        }
+
+        .login-brand::after {
+            content: "";
+            position: absolute;
+            width: 620px;
+            height: 620px;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            right: -250px;
+            top: 150px;
+        }
+
+        .brand-lines {
+            position: absolute;
+            width: 520px;
+            height: 520px;
+            border: 2px solid rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
+            right: -160px;
+            top: 250px;
+        }
+
+        .brand-content,
+        .brand-footer {
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-symbol {
+            width: 92px;
+            height: 92px;
+            position: relative;
+            margin-bottom: 70px;
+        }
+
+        .brand-symbol span {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 88px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 50px;
+            transform-origin: center;
+        }
+
+        .brand-symbol span:nth-child(1) {
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+
+        .brand-symbol span:nth-child(2) {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .brand-symbol span:nth-child(3) {
+            transform: translate(-50%, -50%) rotate(90deg);
+        }
+
+        .brand-symbol span:nth-child(4) {
+            transform: translate(-50%, -50%) rotate(135deg);
+        }
+
+        .brand-title {
+            margin: 0;
+            max-width: 620px;
+            font-size: 64px;
+            line-height: 1.08;
+            letter-spacing: -2px;
+            font-weight: 800;
+        }
+
+        .brand-title small {
+            display: block;
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .brand-description {
+            max-width: 610px;
+            margin-top: 34px;
+            font-size: 23px;
+            line-height: 1.35;
+            color: rgba(255, 255, 255, 0.90);
+            letter-spacing: -0.4px;
+        }
+
+        .brand-footer {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.58);
+        }
+
+        .login-form-area {
+            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            padding: 50px 70px;
         }
 
         .login-card {
-            width: 380px;
-            background: #ffffff;
-            padding: 35px;
-            border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 430px;
+        }
+
+        .system-name {
+            font-size: 30px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 120px;
+            letter-spacing: -0.8px;
         }
 
         .login-card h1 {
             margin: 0;
-            text-align: center;
+            font-size: 34px;
             color: #0f172a;
-            font-size: 26px;
+            letter-spacing: -1px;
         }
 
-        .login-card p {
-            text-align: center;
-            color: #64748b;
-            margin-bottom: 25px;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 7px;
-            color: #334155;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
+        .login-card .subtitle {
+            margin: 12px 0 34px;
+            color: #6b7280;
             font-size: 15px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 13px;
-            background: #0f766e;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #115e59;
+            line-height: 1.45;
         }
 
         .alert {
-            padding: 10px;
+            padding: 12px 14px;
             border-radius: 8px;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             font-size: 14px;
+            line-height: 1.4;
         }
 
         .alert-danger {
             background: #fee2e2;
             color: #991b1b;
+            border: 1px solid #fecaca;
         }
 
         .alert-warning {
             background: #fef3c7;
             color: #92400e;
+            border: 1px solid #fde68a;
         }
 
         .alert-success {
             background: #dcfce7;
             color: #166534;
+            border: 1px solid #bbf7d0;
         }
 
-        .footer {
-            margin-top: 22px;
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: none;
+        }
+
+        input {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid #d1d5db;
+            padding: 15px 0;
+            font-size: 16px;
+            color: #111827;
+            outline: none;
+            background: transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        input::placeholder {
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        input:focus {
+            border-bottom-color: #111827;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 12px;
+            padding: 17px;
+            background: #111317;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: #0f766e;
+            transform: translateY(-1px);
+            box-shadow: 0 16px 30px rgba(15, 118, 110, 0.24);
+        }
+
+        .login-note {
+            margin-top: 32px;
             text-align: center;
-            font-size: 13px;
-            color: #94a3b8;
+            color: #9ca3af;
+            font-size: 15px;
+        }
+
+        .login-note strong {
+            color: #111827;
+            text-decoration: underline;
+        }
+
+        .footer-mobile {
+            display: none;
+        }
+
+        @media (max-width: 1100px) {
+            .login-brand {
+                padding: 55px 60px;
+            }
+
+            .brand-title {
+                font-size: 54px;
+            }
+
+            .brand-title small {
+                font-size: 36px;
+            }
+
+            .brand-description {
+                font-size: 20px;
+            }
+
+            .login-form-area {
+                padding: 45px;
+            }
+
+            .system-name {
+                margin-bottom: 80px;
+            }
+        }
+
+        @media (max-width: 850px) {
+            .login-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .login-brand {
+                min-height: 330px;
+                padding: 42px;
+            }
+
+            .brand-symbol {
+                width: 64px;
+                height: 64px;
+                margin-bottom: 35px;
+            }
+
+            .brand-symbol span {
+                width: 62px;
+                height: 8px;
+            }
+
+            .brand-title {
+                font-size: 40px;
+            }
+
+            .brand-title small {
+                font-size: 28px;
+            }
+
+            .brand-description {
+                margin-top: 20px;
+                font-size: 17px;
+            }
+
+            .brand-footer {
+                display: none;
+            }
+
+            .login-form-area {
+                min-height: calc(100vh - 330px);
+                padding: 36px 28px;
+            }
+
+            .system-name {
+                display: none;
+            }
+
+            .footer-mobile {
+                display: block;
+                margin-top: 28px;
+                text-align: center;
+                color: #9ca3af;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .login-brand {
+                min-height: 300px;
+                padding: 34px 26px;
+            }
+
+            .brand-title {
+                font-size: 34px;
+            }
+
+            .brand-title small {
+                font-size: 24px;
+            }
+
+            .brand-description {
+                font-size: 15px;
+            }
+
+            .login-form-area {
+                padding: 34px 24px;
+            }
+
+            .login-card h1 {
+                font-size: 30px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <h1>ROPUSAC</h1>
-        <p>Sistema Web de Gestión de Cotizaciones</p>
+    <main class="login-wrapper">
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
+        <section class="login-brand">
+            <div class="brand-lines"></div>
+
+            <div class="brand-content">
+                <div class="brand-symbol">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <h2 class="brand-title">
+                    <small>Hola,</small>
+                    ROPUSAC
+                </h2>
+
+                <p class="brand-description">
+                    Gestiona cotizaciones, clientes, productos, proveedores, costos
+                    y disponibilidad desde una sola plataforma interna.
+                </p>
+            </div>
+
+            <div class="brand-footer">
+                © 2026 ROPUSAC. Robinson Puse S.A.C.
+            </div>
+        </section>
+
+        <section class="login-form-area">
+            <div class="login-card">
+
+                <div class="system-name">
+                    ROPUSAC
+                </div>
+
+                <h1>Bienvenido</h1>
+                <p class="subtitle">
+                    Ingresa tus credenciales para acceder al sistema de gestión de cotizaciones.
+                </p>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('auth.login') }}">
+                    <div class="form-group">
+                        <label>Correo electrónico</label>
+                        <input type="email" name="email" placeholder="Correo electrónico" required>
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
 
-        <form method="POST" action="{{ url_for('auth.login') }}">
-            <div class="form-group">
-                <label>Correo electrónico</label>
-                <input type="email" name="email" placeholder="admin@ropusac.com" required>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" name="password" placeholder="Contraseña" required>
+                    </div>
+
+                    <button type="submit">Iniciar sesión</button>
+                </form>
+
+                <div class="login-note">
+                    Acceso exclusivo para usuarios autorizados.
+                    <strong>ROPUSAC</strong>
+                </div>
+
+                <div class="footer-mobile">
+                    © 2026 ROPUSAC. Robinson Puse S.A.C.
+                </div>
+
             </div>
+        </section>
 
-            <div class="form-group">
-                <label>Contraseña</label>
-                <input type="password" name="password" placeholder="Ingresa tu contraseña" required>
-            </div>
-
-            <button type="submit">Iniciar sesión</button>
-        </form>
-
-        <div class="footer">
-            Robinson Puse S.A.C.
-        </div>
-    </div>
+    </main>
 
 </body>
 </html>
