@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Usuario | ROPUSAC{% endblock %}
+
+{% block page_title %}Nuevo Usuario{% endblock %}
+
+{% block page_subtitle %}
+Registra un nuevo usuario y asigna su rol dentro del sistema.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Registrar usuario</h3>
+            <p>Completa los datos de acceso del nuevo usuario.</p>
+        </div>
+
+        <a href="{{ url_for('admin.usuarios') }}" class="btn-secondary">Volver</a>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.nuevo_usuario') }}" class="form-grid">
+
+        <div class="form-group">
+            <label>Nombres *</label>
+            <input type="text" name="nombres" required>
+        </div>
+
+        <div class="form-group">
+            <label>Apellidos *</label>
+            <input type="text" name="apellidos" required>
+        </div>
+
+        <div class="form-group">
+            <label>Correo electrónico *</label>
+            <input type="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" name="telefono">
+        </div>
+
+        <div class="form-group">
+            <label>Rol *</label>
+            <select name="rol_id" required>
+                <option value="">Seleccionar rol</option>
+                {% for rol in roles %}
+                    <option value="{{ rol.id }}">{{ rol.nombre|capitalize }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Estado *</label>
+            <select name="estado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+                <option value="bloqueado">Bloqueado</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Contraseña *</label>
+            <input type="password" name="password" required>
+        </div>
+
+        <div class="form-group">
+            <label>Confirmar contraseña *</label>
+            <input type="password" name="confirmar_password" required>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Guardar usuario</button>
+            <a href="{{ url_for('admin.usuarios') }}" class="btn-secondary">Cancelar</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

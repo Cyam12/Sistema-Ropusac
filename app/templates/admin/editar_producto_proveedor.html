@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Costo | ROPUSAC{% endblock %}
+
+{% block page_title %}Editar Costo por Proveedor{% endblock %}
+
+{% block page_subtitle %}
+Actualiza el costo, disponibilidad y tiempo de entrega del proveedor.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>{{ producto.codigo }} - {{ producto.nombre }}</h3>
+            <p>Modifica la información del proveedor asociado.</p>
+        </div>
+
+        <a href="{{ url_for('admin.producto_proveedores', producto_id=producto.id) }}" class="btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.editar_producto_proveedor', producto_id=producto.id, relacion_id=relacion.id) }}" class="form-grid">
+
+        <div class="form-group">
+            <label>Proveedor *</label>
+            <select name="proveedor_id" required>
+                <option value="">Seleccionar proveedor</option>
+                {% for proveedor in proveedores %}
+                    <option value="{{ proveedor.id }}" {% if relacion.proveedor_id == proveedor.id %}selected{% endif %}>
+                        {{ proveedor.razon_social }} {% if proveedor.ruc %}- {{ proveedor.ruc }}{% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Código del proveedor</label>
+            <input type="text" name="codigo_proveedor" value="{{ relacion.codigo_proveedor or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Costo unitario actual *</label>
+            <input type="number" name="costo_unitario" step="0.01" min="0" value="{{ relacion.costo_unitario }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Precio anterior</label>
+            <input type="number" name="precio_anterior" step="0.01" min="0" value="{{ relacion.precio_anterior }}">
+        </div>
+
+        <div class="form-group">
+            <label>Disponibilidad *</label>
+            <select name="disponibilidad" required>
+                <option value="disponible" {% if relacion.disponibilidad == 'disponible' %}selected{% endif %}>Disponible</option>
+                <option value="bajo_stock" {% if relacion.disponibilidad == 'bajo_stock' %}selected{% endif %}>Bajo stock</option>
+                <option value="agotado" {% if relacion.disponibilidad == 'agotado' %}selected{% endif %}>Agotado</option>
+                <option value="por_confirmar" {% if relacion.disponibilidad == 'por_confirmar' %}selected{% endif %}>Por confirmar</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tiempo de entrega en días</label>
+            <input type="number" name="tiempo_entrega_dias" min="0" value="{{ relacion.tiempo_entrega_dias }}">
+        </div>
+
+        <div class="form-group">
+            <label>Fecha de actualización *</label>
+            <input type="date" name="fecha_actualizacion" value="{{ relacion.fecha_actualizacion }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Estado *</label>
+            <select name="estado" required>
+                <option value="activo" {% if relacion.estado == 'activo' %}selected{% endif %}>Activo</option>
+                <option value="inactivo" {% if relacion.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Observación</label>
+            <textarea name="observacion" rows="4">{{ relacion.observacion or '' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Actualizar costo</button>
+            <a href="{{ url_for('admin.producto_proveedores', producto_id=producto.id) }}" class="btn-secondary">Cancelar</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

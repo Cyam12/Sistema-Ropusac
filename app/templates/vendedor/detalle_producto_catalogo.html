@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle Producto | ROPUSAC{% endblock %}
+
+{% block page_title %}Detalle del Producto{% endblock %}
+
+{% block page_subtitle %}
+Consulta información comercial, stock y disponibilidad del producto.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>{{ producto.codigo }} - {{ producto.nombre }}</h3>
+            <p>Información general del producto seleccionado.</p>
+        </div>
+
+        <div class="table-actions">
+            <a href="{{ url_for('vendedor.nueva_cotizacion') }}" class="btn-primary">
+                Nueva cotización
+            </a>
+
+            <a href="{{ url_for('vendedor.catalogo') }}" class="btn-secondary">
+                Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+
+        <div class="detail-box">
+            <span>Código</span>
+            <strong>{{ producto.codigo }}</strong>
+            <p>Identificador interno del producto</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Categoría</span>
+            <strong>{{ producto.categoria or '-' }}</strong>
+            <p>Clasificación del producto</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Marca / Modelo</span>
+            <strong>{{ producto.marca or '-' }}</strong>
+            <p>{{ producto.modelo or '-' }}</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Unidad</span>
+            <strong>{{ producto.unidad or '-' }}</strong>
+            <p>{{ producto.unidad_nombre or '-' }}</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Precio de venta sugerido</span>
+            <strong>S/ {{ "%.2f"|format(producto.precio_venta_sugerido) }}</strong>
+            <p>Precio referencial para cotización</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Stock actual</span>
+            <strong>{{ "%.2f"|format(producto.stock_actual) }}</strong>
+
+            {% if producto.stock_actual == 0 %}
+                <p><span class="badge badge-danger">Agotado</span></p>
+            {% elif producto.stock_actual <= producto.stock_minimo %}
+                <p><span class="badge badge-warning">Stock bajo</span></p>
+            {% else %}
+                <p><span class="badge badge-success">Disponible</span></p>
+            {% endif %}
+        </div>
+
+        <div class="detail-box">
+            <span>Stock mínimo</span>
+            <strong>{{ "%.2f"|format(producto.stock_minimo) }}</strong>
+            <p>Límite mínimo de control</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Estado</span>
+            <strong>{{ producto.estado|capitalize }}</strong>
+            <p>Producto activo para venta</p>
+        </div>
+
+    </div>
+
+</div>
+
+{% if producto.descripcion %}
+    <div class="panel">
+        <h3>Descripción</h3>
+        <p>{{ producto.descripcion }}</p>
+    </div>
+{% endif %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Disponibilidad por proveedor</h3>
+            <p>Consulta proveedores activos asociados al producto.</p>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Proveedor</th>
+                    <th>RUC</th>
+                    <th>Código proveedor</th>
+                    <th>Disponibilidad</th>
+                    <th>Tiempo entrega</th>
+                    <th>Última actualización</th>
+                    <th>Observación</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if proveedores %}
+                    {% for item in proveedores %}
+                        <tr>
+                            <td><strong>{{ item.proveedor }}</strong></td>
+                            <td>{{ item.ruc or '-' }}</td>
+                            <td>{{ item.codigo_proveedor or '-' }}</td>
+
+                            <td>
+                                {% if item.disponibilidad == 'disponible' %}
+                                    <span class="badge badge-success">Disponible</span>
+                                {% elif item.disponibilidad == 'bajo_stock' %}
+                                    <span class="badge badge-warning">Bajo stock</span>
+                                {% elif item.disponibilidad == 'agotado' %}
+                                    <span class="badge badge-danger">Agotado</span>
+                                {% else %}
+                                    <span class="badge badge-info">Por confirmar</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ item.tiempo_entrega_dias }} días</td>
+                            <td>{{ item.fecha_actualizacion }}</td>
+                            <td>{{ item.observacion or '-' }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            Este producto aún no tiene proveedores asociados.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

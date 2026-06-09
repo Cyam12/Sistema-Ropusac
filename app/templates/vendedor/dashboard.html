@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Vendedor | ROPUSAC{% endblock %}
+
+{% block page_title %}Dashboard Vendedor{% endblock %}
+
+{% block page_subtitle %}
+Panel comercial para gestionar clientes, cotizaciones y catálogo de productos.
+{% endblock %}
+
+{% block content %}
+
+<div class="cards-grid">
+
+    <div class="card">
+        <span>Mis cotizaciones</span>
+        <h2>{{ metricas.mis_cotizaciones }}</h2>
+        <p>Cotizaciones generadas por tu usuario</p>
+    </div>
+
+    <div class="card">
+        <span>Cotizaciones pendientes</span>
+        <h2>{{ metricas.cotizaciones_pendientes }}</h2>
+        <p>Cotizaciones pendientes de cierre</p>
+    </div>
+
+    <div class="card">
+        <span>Total vendido</span>
+        <h2>S/ {{ "%.2f"|format(metricas.total_vendido) }}</h2>
+        <p>Ventas cerradas por tu usuario</p>
+    </div>
+
+    <div class="card">
+        <span>Clientes registrados</span>
+        <h2>{{ metricas.clientes_registrados }}</h2>
+        <p>Clientes creados por tu usuario</p>
+    </div>
+
+</div>
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Acciones rápidas</h3>
+            <p>Accesos principales para el trabajo comercial diario.</p>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <a href="{{ url_for('vendedor.nueva_cotizacion') }}">Nueva cotización</a>
+        <a href="{{ url_for('vendedor.nuevo_cliente') }}">Agregar cliente</a>
+        <a href="{{ url_for('vendedor.mis_cotizaciones') }}">Mis cotizaciones</a>
+        <a href="{{ url_for('vendedor.catalogo') }}">Catálogo de productos</a>
+    </div>
+
+</div>
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Resumen del módulo vendedor</h3>
+            <p>Desde este panel podrás administrar tus operaciones comerciales.</p>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+
+        <div class="detail-box">
+            <span>Clientes</span>
+            <strong>Registro y consulta</strong>
+            <p>Agrega nuevos clientes y consulta clientes existentes.</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Cotizaciones</span>
+            <strong>Creación y seguimiento</strong>
+            <p>Genera cotizaciones y revisa tu historial comercial.</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Catálogo</span>
+            <strong>Solo lectura</strong>
+            <p>Consulta productos, precios y disponibilidad.</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Alertas</span>
+            <strong>Pendientes</strong>
+            <p>Identifica cotizaciones sin cerrar y clientes frecuentes.</p>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

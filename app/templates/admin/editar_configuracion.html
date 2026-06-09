@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Configuración | ROPUSAC{% endblock %}
+
+{% block page_title %}Editar Configuración{% endblock %}
+
+{% block page_subtitle %}
+Actualiza el valor o descripción de un parámetro del sistema.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Editar configuración</h3>
+            <p>
+                {% if configuracion_item.clave in protegidas %}
+                    Esta es una configuración principal del sistema.
+                {% else %}
+                    Esta es una configuración personalizada.
+                {% endif %}
+            </p>
+        </div>
+
+        <a href="{{ url_for('admin.configuracion') }}" class="btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.editar_configuracion', configuracion_id=configuracion_item.id) }}" class="form-grid">
+
+        <div class="form-group">
+            <label>Clave *</label>
+            <input 
+                type="text" 
+                name="clave" 
+                value="{{ configuracion_item.clave }}"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Valor</label>
+            <input 
+                type="text" 
+                name="valor"
+                value="{{ configuracion_item.valor or '' }}"
+            >
+        </div>
+
+        <div class="form-group full-width">
+            <label>Descripción</label>
+            <textarea name="descripcion" rows="4">{{ configuracion_item.descripcion or '' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                Actualizar configuración
+            </button>
+
+            <a href="{{ url_for('admin.configuracion') }}" class="btn-secondary">
+                Cancelar
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

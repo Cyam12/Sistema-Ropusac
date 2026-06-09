@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Cliente | ROPUSAC{% endblock %}
+
+{% block page_title %}Nuevo Cliente{% endblock %}
+
+{% block page_subtitle %}
+Registra un nuevo cliente para generar cotizaciones.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Registrar cliente</h3>
+            <p>Completa la información comercial del cliente.</p>
+        </div>
+
+        <a href="{{ url_for('admin.clientes') }}" class="btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.nuevo_cliente') }}" class="form-grid">
+
+        <div class="form-group">
+            <label>Tipo de documento *</label>
+            <select name="tipo_documento" required>
+                <option value="RUC">RUC</option>
+                <option value="DNI">DNI</option>
+                <option value="CE">CE</option>
+                <option value="SIN_DOCUMENTO">Sin documento</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Número de documento</label>
+            <input type="text" name="numero_documento">
+        </div>
+
+        <div class="form-group">
+            <label>Razón social / Nombre *</label>
+            <input type="text" name="razon_social" required>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre comercial</label>
+            <input type="text" name="nombre_comercial">
+        </div>
+
+        <div class="form-group">
+            <label>Contacto</label>
+            <input type="text" name="contacto">
+        </div>
+
+        <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" name="telefono">
+        </div>
+
+        <div class="form-group">
+            <label>Correo electrónico</label>
+            <input type="email" name="email">
+        </div>
+
+        <div class="form-group">
+            <label>Estado *</label>
+            <select name="estado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Dirección</label>
+            <input type="text" name="direccion">
+        </div>
+
+        <div class="form-group">
+            <label>Distrito</label>
+            <input type="text" name="distrito">
+        </div>
+
+        <div class="form-group">
+            <label>Provincia</label>
+            <input type="text" name="provincia">
+        </div>
+
+        <div class="form-group">
+            <label>Departamento</label>
+            <input type="text" name="departamento">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Guardar cliente</button>
+            <a href="{{ url_for('admin.clientes') }}" class="btn-secondary">Cancelar</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

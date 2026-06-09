@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Usuarios | ROPUSAC{% endblock %}
+
+{% block page_title %}Gestión de Usuarios{% endblock %}
+
+{% block page_subtitle %}
+Administra los usuarios del sistema y sus roles de acceso.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Usuarios registrados</h3>
+            <p>Listado general de usuarios con acceso al sistema.</p>
+        </div>
+
+        <a href="{{ url_for('admin.nuevo_usuario') }}" class="btn-primary">Nuevo usuario</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Último login</th>
+                    <th>Fecha registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if usuarios %}
+                    {% for usuario in usuarios %}
+                        <tr>
+                            <td>{{ usuario.id }}</td>
+
+                            <td>
+                                <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+                            </td>
+
+                            <td>{{ usuario.email }}</td>
+
+                            <td>
+                                {% if usuario.telefono %}
+                                    {{ usuario.telefono }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <span class="badge badge-info">
+                                    {{ usuario.rol|capitalize }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {% if usuario.estado == 'activo' %}
+                                    <span class="badge badge-success">Activo</span>
+                                {% elif usuario.estado == 'inactivo' %}
+                                    <span class="badge badge-warning">Inactivo</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Bloqueado</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if usuario.ultimo_login %}
+                                    {{ usuario.ultimo_login }}
+                                {% else %}
+                                    Nunca
+                                {% endif %}
+                            </td>
+
+                            <td>{{ usuario.created_at }}</td>
+
+                            <td>
+                                <div class="table-actions">
+                                    <a href="{{ url_for('admin.editar_usuario', usuario_id=usuario.id) }}" class="btn-small">
+                                        Editar
+                                    </a>
+
+                                    {% if usuario.id != current_user.id|int %}
+                                        <form method="POST"
+                                            action="{{ url_for('admin.eliminar_usuario', usuario_id=usuario.id) }}"
+                                            class="inline-form"
+                                            onsubmit="return confirm('¿Seguro que deseas eliminar este usuario? Esta acción no se puede deshacer.');">
+                                            <button type="submit" class="btn-small btn-danger">
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="badge badge-warning">Usuario actual</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            No hay usuarios registrados.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

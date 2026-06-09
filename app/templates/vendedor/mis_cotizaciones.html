@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Cotizaciones | ROPUSAC{% endblock %}
+
+{% block page_title %}Mis Cotizaciones{% endblock %}
+
+{% block page_subtitle %}
+Consulta y gestiona las cotizaciones generadas por tu usuario.
+{% endblock %}
+
+{% block content %}
+
+<div class="cards-grid">
+
+    <div class="card">
+        <span>Total cotizaciones</span>
+        <h2>{{ resumen.total_cotizaciones }}</h2>
+        <p>Cotizaciones generadas</p>
+    </div>
+
+    <div class="card">
+        <span>Total cotizado</span>
+        <h2>S/ {{ "%.2f"|format(resumen.total_cotizado) }}</h2>
+        <p>Monto total cotizado</p>
+    </div>
+
+    <div class="card">
+        <span>Total margen</span>
+        <h2>S/ {{ "%.2f"|format(resumen.total_margen) }}</h2>
+        <p>Margen acumulado</p>
+    </div>
+
+    <div class="card">
+        <span>Margen promedio</span>
+        <h2>{{ "%.2f"|format(resumen.margen_promedio) }}%</h2>
+        <p>Promedio sobre subtotal</p>
+    </div>
+
+</div>
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Listado de cotizaciones</h3>
+            <p>Filtra tus cotizaciones por cliente, estado o fecha.</p>
+        </div>
+
+        <a href="{{ url_for('vendedor.nueva_cotizacion') }}" class="btn-primary">
+            Nueva cotización
+        </a>
+    </div>
+
+    <form method="GET" action="{{ url_for('vendedor.mis_cotizaciones') }}" class="form-grid filter-grid">
+
+        <div class="form-group">
+            <label>Cliente</label>
+            <input 
+                type="text" 
+                name="cliente" 
+                placeholder="Razón social o documento"
+                value="{{ filtros.cliente }}"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Estado</label>
+            <select name="estado_id">
+                <option value="">Todos</option>
+                {% for estado in estados %}
+                    <option value="{{ estado.id }}" {% if filtros.estado_id|int == estado.id %}selected{% endif %}>
+                        {{ estado.nombre|capitalize }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Fecha inicio</label>
+            <input type="date" name="fecha_inicio" value="{{ filtros.fecha_inicio }}">
+        </div>
+
+        <div class="form-group">
+            <label>Fecha fin</label>
+            <input type="date" name="fecha_fin" value="{{ filtros.fecha_fin }}">
+        </div>
+
+        <div class="form-actions filter-actions">
+            <button type="submit" class="btn-primary">Filtrar</button>
+            <a href="{{ url_for('vendedor.mis_cotizaciones') }}" class="btn-secondary">Limpiar</a>
+        </div>
+
+    </form>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Estado</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Costo</th>
+                    <th>Margen</th>
+                    <th>% Margen</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if cotizaciones %}
+                    {% for cotizacion in cotizaciones %}
+                        <tr>
+                            <td>
+                                <strong>{{ cotizacion.codigo }}</strong>
+                                <br>
+                                <span class="text-muted">{{ cotizacion.moneda }}</span>
+                            </td>
+
+                            <td>
+                                {{ cotizacion.fecha_emision }}
+
+                                {% if cotizacion.fecha_vencimiento %}
+                                    <br>
+                                    <span class="text-muted">
+                                        Vence: {{ cotizacion.fecha_vencimiento }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <strong>{{ cotizacion.cliente }}</strong>
+                                <br>
+                                <span class="text-muted">
+                                    {{ cotizacion.documento_cliente or '-' }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {% if cotizacion.estado == 'borrador' %}
+                                    <span class="badge badge-info">Borrador</span>
+                                {% elif cotizacion.estado == 'pendiente' %}
+                                    <span class="badge badge-warning">Pendiente</span>
+                                {% elif cotizacion.estado == 'aprobada' %}
+                                    <span class="badge badge-success">Aprobada</span>
+                                {% elif cotizacion.estado == 'cerrada' %}
+                                    <span class="badge badge-success">Cerrada</span>
+                                {% elif cotizacion.estado == 'rechazada' %}
+                                    <span class="badge badge-danger">Rechazada</span>
+                                {% else %}
+                                    <span class="badge badge-warning">{{ cotizacion.estado|capitalize }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ cotizacion.total_items }}</td>
+
+                            <td>S/ {{ "%.2f"|format(cotizacion.total) }}</td>
+                            <td>S/ {{ "%.2f"|format(cotizacion.costo_total) }}</td>
+                            <td>S/ {{ "%.2f"|format(cotizacion.margen_total) }}</td>
+                            <td>{{ "%.2f"|format(cotizacion.margen_porcentaje) }}%</td>
+
+                            <td>
+                                <div class="table-actions">
+                                    <a href="{{ url_for('vendedor.detalle_mi_cotizacion', cotizacion_id=cotizacion.id) }}" class="btn-small">
+                                        Ver
+                                    </a>
+                                    <a href="{{ url_for('vendedor.descargar_cotizacion_pdf', cotizacion_id=cotizacion.id) }}" class="btn-small">
+                                        PDF
+                                    </a>
+                                    <form method="POST"
+                                          action="{{ url_for('vendedor.eliminar_mi_cotizacion', cotizacion_id=cotizacion.id) }}"
+                                          class="inline-form"
+                                          onsubmit="return confirm('¿Seguro que deseas eliminar esta cotización? Esta acción eliminará también sus detalles.');">
+                                        <button type="submit" class="btn-small btn-danger">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center">
+                            No tienes cotizaciones registradas con los filtros seleccionados.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

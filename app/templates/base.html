@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}ROPUSAC{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+    <div class="layout">
+
+        <aside class="sidebar">
+            <div class="brand">
+                <h2>ROPUSAC</h2>
+                <span>Cotizaciones</span>
+            </div>
+
+            <nav class="menu">
+                {% if current_user.rol_nombre == 'administrador' %}
+                    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('admin.usuarios') }}">Usuarios</a>
+                    <a href="{{ url_for('admin.clientes') }}">Clientes</a>
+                    <a href="{{ url_for('admin.proveedores') }}">Proveedores</a>
+                    <a href="{{ url_for('admin.productos') }}">Productos</a>
+                    <a href="{{ url_for('admin.cotizaciones') }}">Cotizaciones</a>
+                    <a href="{{ url_for('admin.reportes') }}">Reportes</a>
+                    <a href="{{ url_for('admin.configuracion') }}">Configuración</a>
+                {% endif %}
+
+                {% if current_user.rol_nombre == 'vendedor' %}
+                    <a href="{{ url_for('vendedor.dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('vendedor.clientes') }}">Clientes</a>
+                    <a href="{{ url_for('vendedor.nueva_cotizacion') }}">Nueva Cotización</a>
+                    <a href="{{ url_for('vendedor.mis_cotizaciones') }}">Mis Cotizaciones</a>
+                    <a href="{{ url_for('vendedor.catalogo') }}">Catálogo</a>
+                {% endif %}
+
+                {% if current_user.rol_nombre == 'logistica' %}
+                    <a href="{{ url_for('logistica.dashboard') }}">Dashboard</a>
+                    <a href="#">Productos</a>
+                    <a href="#">Proveedores</a>
+                    <a href="#">Costos</a>
+                    <a href="#">Disponibilidad</a>
+                {% endif %}
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="topbar">
+                <div>
+                    <h1>{% block page_title %}Panel{% endblock %}</h1>
+                    <p>{% block page_subtitle %}Sistema de Gestión de Cotizaciones{% endblock %}</p>
+                </div>
+
+                <div class="user-box">
+                    <strong>{{ current_user.nombres }} {{ current_user.apellidos }}</strong>
+                    <span>{{ current_user.rol_nombre|capitalize }}</span>
+                </div>
+            </header>
+
+            <section class="content">
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+</html>

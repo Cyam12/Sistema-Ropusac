@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Cotización | ROPUSAC{% endblock %}
+
+{% block page_title %}Nueva Cotización{% endblock %}
+
+{% block page_subtitle %}
+Genera cotizaciones con cálculo automático de costos, IGV, total y margen de ganancia.
+{% endblock %}
+
+{% block content %}
+
+<form method="POST" action="{{ url_for('vendedor.nueva_cotizacion') }}" id="formCotizacion">
+
+    <div class="panel">
+
+        <div class="panel-header">
+            <div>
+                <h3>Datos de la cotización</h3>
+                <p>Selecciona el cliente y define las fechas de emisión y vencimiento.</p>
+            </div>
+
+            <a href="{{ url_for('vendedor.clientes') }}" class="btn-secondary">
+                Ver clientes
+            </a>
+        </div>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Cliente *</label>
+                <select name="cliente_id" required>
+                    <option value="">Seleccionar cliente</option>
+                    {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}">
+                            {{ cliente.razon_social }} -
+                            {{ cliente.tipo_documento }}
+                            {{ cliente.numero_documento or '' }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Fecha emisión *</label>
+                <input type="date" name="fecha_emision" value="{{ fecha_emision_default }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Fecha vencimiento</label>
+                <input type="date" name="fecha_vencimiento" value="{{ fecha_vencimiento_default }}">
+            </div>
+
+            <div class="form-group">
+                <label>Moneda *</label>
+                <select name="moneda" required>
+                    <option value="PEN" {% if moneda_principal == 'PEN' %}selected{% endif %}>Soles - PEN</option>
+                    <option value="USD" {% if moneda_principal == 'USD' %}selected{% endif %}>Dólares - USD</option>
+                </select>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <div class="panel-header">
+            <div>
+                <h3>Productos de la cotización</h3>
+                <p>Agrega productos, cantidades, precios y descuentos.</p>
+            </div>
+
+            <button type="button" class="btn-primary" onclick="agregarFilaProducto()">
+                Agregar producto
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table" id="tablaProductos">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Descripción</th>
+                        <th>Proveedor</th>
+                        <th>Unidad</th>
+                        <th>Cantidad</th>
+                        <th>Precio venta</th>
+                        <th>Costo</th>
+                        <th>Desc. %</th>
+                        <th>Subtotal</th>
+                        <th>Margen</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+
+                <tbody id="detalleProductos">
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="summary-panel">
+
+        <div class="summary-card">
+            <span>Subtotal</span>
+            <strong id="subtotalTexto">S/ 0.00</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Descuento total</span>
+            <strong id="descuentoTexto">S/ 0.00</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>IGV {{ "%.2f"|format(igv_porcentaje) }}%</span>
+            <strong id="igvTexto">S/ 0.00</strong>
+        </div>
+
+        <div class="summary-card total-card">
+            <span>Total</span>
+            <strong id="totalTexto">S/ 0.00</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Costo total</span>
+            <strong id="costoTexto">S/ 0.00</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Margen total</span>
+            <strong id="margenTexto">S/ 0.00</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Margen %</span>
+            <strong id="margenPorcentajeTexto">0.00%</strong>
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <div class="panel-header">
+            <div>
+                <h3>Observaciones y condiciones</h3>
+                <p>Agrega información adicional para el cliente.</p>
+            </div>
+        </div>
+
+        <div class="form-grid">
+
+            <div class="form-group full-width">
+                <label>Observaciones</label>
+                <textarea name="observaciones" rows="3" placeholder="Ejemplo: Entrega según disponibilidad de stock."></textarea>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Condiciones comerciales</label>
+                <textarea name="condiciones" rows="3" placeholder="Ejemplo: Validez de la oferta, forma de pago, tiempo de entrega."></textarea>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                Guardar cotización
+            </button>
+
+            <a href="{{ url_for('vendedor.dashboard') }}" class="btn-secondary">
+                Cancelar
+            </a>
+        </div>
+
+    </div>
+
+</form>
+
+<script>
+    const productos = {{ productos_json|tojson }};
+    const igvPorcentaje = parseFloat("{{ igv_porcentaje }}");
+
+    function formatoMoneda(valor) {
+        return "S/ " + valor.toFixed(2);
+    }
+
+    function obtenerProductoPorId(id) {
+        return productos.find(producto => String(producto.id) === String(id));
+    }
+
+    function agregarFilaProducto() {
+        const tbody = document.getElementById("detalleProductos");
+        const fila = document.createElement("tr");
+
+        let opcionesProductos = '<option value="">Seleccionar</option>';
+
+        productos.forEach(producto => {
+            opcionesProductos += `
+                <option value="${producto.id}">
+                    ${producto.codigo} - ${producto.nombre}
+                </option>
+            `;
+        });
+
+        fila.innerHTML = `
+            <td>
+                <select name="producto_id[]" class="producto-select" onchange="cargarProducto(this)" required>
+                    ${opcionesProductos}
+                </select>
+            </td>
+
+            <td>
+                <input type="text" name="descripcion_producto[]" class="descripcion-input" required>
+            </td>
+
+            <td>
+                <input type="hidden" name="proveedor_id[]" class="proveedor-id-input">
+                <input type="text" class="proveedor-input" readonly>
+            </td>
+
+            <td>
+                <input type="hidden" name="unidad_id[]" class="unidad-id-input">
+                <input type="text" class="unidad-input" readonly>
+            </td>
+
+            <td>
+                <input type="number" name="cantidad[]" class="cantidad-input" min="0.01" step="0.01" value="1" oninput="calcularTotales()" required>
+            </td>
+
+            <td>
+                <input type="number" name="precio_unitario[]" class="precio-input" min="0" step="0.01" value="0.00" oninput="calcularTotales()" required>
+            </td>
+
+            <td>
+                <input type="number" name="costo_unitario[]" class="costo-input" min="0" step="0.01" value="0.00" oninput="calcularTotales()" required>
+            </td>
+
+            <td>
+                <input type="number" name="descuento_porcentaje[]" class="descuento-input" min="0" max="100" step="0.01" value="0.00" oninput="calcularTotales()">
+                <input type="hidden" name="observacion_item[]" value="">
+            </td>
+
+            <td>
+                <strong class="subtotal-item">S/ 0.00</strong>
+            </td>
+
+            <td>
+                <strong class="margen-item">S/ 0.00</strong>
+                <br>
+                <span class="text-muted margen-porcentaje-item">0.00%</span>
+            </td>
+
+            <td>
+                <button type="button" class="btn-small btn-danger" onclick="eliminarFila(this)">
+                    Quitar
+                </button>
+            </td>
+        `;
+
+        tbody.appendChild(fila);
+    }
+
+    function cargarProducto(select) {
+        const fila = select.closest("tr");
+        const producto = obtenerProductoPorId(select.value);
+
+        if (!producto) {
+            return;
+        }
+
+        fila.querySelector(".descripcion-input").value = producto.descripcion || producto.nombre;
+        fila.querySelector(".proveedor-id-input").value = producto.proveedor_id || "";
+        fila.querySelector(".proveedor-input").value = producto.proveedor || "Sin proveedor";
+        fila.querySelector(".unidad-id-input").value = producto.unidad_id || "";
+        fila.querySelector(".unidad-input").value = producto.unidad || "-";
+        fila.querySelector(".precio-input").value = parseFloat(producto.precio_venta_sugerido || 0).toFixed(2);
+        fila.querySelector(".costo-input").value = parseFloat(producto.costo_unitario || 0).toFixed(2);
+
+        calcularTotales();
+    }
+
+    function eliminarFila(boton) {
+        boton.closest("tr").remove();
+        calcularTotales();
+    }
+
+    function calcularTotales() {
+        const filas = document.querySelectorAll("#detalleProductos tr");
+
+        let subtotalGeneral = 0;
+        let descuentoGeneral = 0;
+        let costoGeneral = 0;
+        let margenGeneral = 0;
+
+        filas.forEach(fila => {
+            const cantidad = parseFloat(fila.querySelector(".cantidad-input").value) || 0;
+            const precio = parseFloat(fila.querySelector(".precio-input").value) || 0;
+            const costo = parseFloat(fila.querySelector(".costo-input").value) || 0;
+            const descuentoPorcentaje = parseFloat(fila.querySelector(".descuento-input").value) || 0;
+
+            const importeBruto = cantidad * precio;
+            const descuentoMonto = importeBruto * (descuentoPorcentaje / 100);
+            const subtotalItem = importeBruto - descuentoMonto;
+            const costoItem = cantidad * costo;
+            const margenItem = subtotalItem - costoItem;
+            const margenPorcentajeItem = subtotalItem > 0 ? (margenItem / subtotalItem) * 100 : 0;
+
+            subtotalGeneral += subtotalItem;
+            descuentoGeneral += descuentoMonto;
+            costoGeneral += costoItem;
+            margenGeneral += margenItem;
+
+            fila.querySelector(".subtotal-item").textContent = formatoMoneda(subtotalItem);
+            fila.querySelector(".margen-item").textContent = formatoMoneda(margenItem);
+            fila.querySelector(".margen-porcentaje-item").textContent = margenPorcentajeItem.toFixed(2) + "%";
+        });
+
+        const igv = subtotalGeneral * (igvPorcentaje / 100);
+        const total = subtotalGeneral + igv;
+        const margenPorcentajeGeneral = subtotalGeneral > 0 ? (margenGeneral / subtotalGeneral) * 100 : 0;
+
+        document.getElementById("subtotalTexto").textContent = formatoMoneda(subtotalGeneral);
+        document.getElementById("descuentoTexto").textContent = formatoMoneda(descuentoGeneral);
+        document.getElementById("igvTexto").textContent = formatoMoneda(igv);
+        document.getElementById("totalTexto").textContent = formatoMoneda(total);
+        document.getElementById("costoTexto").textContent = formatoMoneda(costoGeneral);
+        document.getElementById("margenTexto").textContent = formatoMoneda(margenGeneral);
+        document.getElementById("margenPorcentajeTexto").textContent = margenPorcentajeGeneral.toFixed(2) + "%";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        agregarFilaProducto();
+    });
+</script>
+
+{% endblock %}

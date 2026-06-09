@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle Cotización | ROPUSAC{% endblock %}
+
+{% block page_title %}Detalle de Cotización{% endblock %}
+
+{% block page_subtitle %}
+Información completa de la cotización generada por tu usuario.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>{{ cotizacion.codigo }}</h3>
+            <p>
+                Cliente: {{ cotizacion.cliente }} |
+                Estado actual: {{ cotizacion.estado|capitalize }}
+            </p>
+        </div>
+
+        <div class="table-actions">
+            <a href="{{ url_for('vendedor.descargar_cotizacion_pdf', cotizacion_id=cotizacion.id) }}" class="btn-primary">
+                Descargar PDF
+            </a>
+
+            <a href="{{ url_for('vendedor.mis_cotizaciones') }}" class="btn-secondary">
+                Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+
+        <div class="detail-box">
+            <span>Cliente</span>
+            <strong>{{ cotizacion.cliente }}</strong>
+            <p>
+                {{ cotizacion.tipo_documento }}:
+                {{ cotizacion.numero_documento or '-' }}
+            </p>
+        </div>
+
+        <div class="detail-box">
+            <span>Contacto</span>
+            <strong>{{ cotizacion.contacto or '-' }}</strong>
+            <p>{{ cotizacion.cliente_telefono or '-' }}</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Correo</span>
+            <strong>{{ cotizacion.cliente_email or '-' }}</strong>
+            <p>Contacto comercial</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Fechas</span>
+            <strong>Emisión: {{ cotizacion.fecha_emision }}</strong>
+            <p>Vencimiento: {{ cotizacion.fecha_vencimiento or '-' }}</p>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Actualizar estado</h3>
+            <p>Cambia el estado de seguimiento de tu cotización.</p>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('vendedor.cambiar_estado_mi_cotizacion', cotizacion_id=cotizacion.id) }}" class="status-form">
+        <select name="estado_id" required>
+            {% for estado in estados %}
+                <option value="{{ estado.id }}" {% if estado.id == cotizacion.estado_id %}selected{% endif %}>
+                    {{ estado.nombre|capitalize }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="btn-primary">
+            Actualizar estado
+        </button>
+    </form>
+
+</div>
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Detalle de productos</h3>
+            <p>Productos, cantidades, costos y márgenes incluidos en la cotización.</p>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Proveedor</th>
+                    <th>Unidad</th>
+                    <th>Cantidad</th>
+                    <th>Precio unitario</th>
+                    <th>Costo unitario</th>
+                    <th>Descuento</th>
+                    <th>Subtotal</th>
+                    <th>Costo total</th>
+                    <th>Margen</th>
+                    <th>% Margen</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if detalles %}
+                    {% for item in detalles %}
+                        <tr>
+                            <td>
+                                <strong>{{ item.descripcion_producto }}</strong>
+
+                                {% if item.codigo_producto %}
+                                    <br>
+                                    <span class="text-muted">{{ item.codigo_producto }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ item.proveedor or '-' }}</td>
+                            <td>{{ item.unidad or '-' }}</td>
+                            <td>{{ "%.2f"|format(item.cantidad) }}</td>
+                            <td>S/ {{ "%.2f"|format(item.precio_unitario) }}</td>
+                            <td>S/ {{ "%.2f"|format(item.costo_unitario) }}</td>
+                            <td>
+                                {{ "%.2f"|format(item.descuento_porcentaje) }}%
+                                <br>
+                                <span class="text-muted">
+                                    S/ {{ "%.2f"|format(item.descuento_monto) }}
+                                </span>
+                            </td>
+                            <td>S/ {{ "%.2f"|format(item.subtotal) }}</td>
+                            <td>S/ {{ "%.2f"|format(item.costo_total) }}</td>
+                            <td>S/ {{ "%.2f"|format(item.margen) }}</td>
+                            <td>{{ "%.2f"|format(item.margen_porcentaje) }}%</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="11" class="text-center">
+                            Esta cotización no tiene productos registrados.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="summary-panel">
+
+    <div class="summary-card">
+        <span>Subtotal</span>
+        <strong>S/ {{ "%.2f"|format(cotizacion.subtotal) }}</strong>
+    </div>
+
+    <div class="summary-card">
+        <span>Descuento total</span>
+        <strong>S/ {{ "%.2f"|format(cotizacion.descuento_total) }}</strong>
+    </div>
+
+    <div class="summary-card">
+        <span>IGV {{ "%.2f"|format(cotizacion.igv_porcentaje) }}%</span>
+        <strong>S/ {{ "%.2f"|format(cotizacion.igv) }}</strong>
+    </div>
+
+    <div class="summary-card total-card">
+        <span>Total</span>
+        <strong>S/ {{ "%.2f"|format(cotizacion.total) }}</strong>
+    </div>
+
+    <div class="summary-card">
+        <span>Costo total</span>
+        <strong>S/ {{ "%.2f"|format(cotizacion.costo_total) }}</strong>
+    </div>
+
+    <div class="summary-card">
+        <span>Margen total</span>
+        <strong>S/ {{ "%.2f"|format(cotizacion.margen_total) }}</strong>
+    </div>
+
+    <div class="summary-card">
+        <span>Margen %</span>
+        <strong>{{ "%.2f"|format(cotizacion.margen_porcentaje) }}%</strong>
+    </div>
+
+</div>
+
+{% if cotizacion.observaciones or cotizacion.condiciones %}
+    <div class="panel">
+        <h3>Observaciones y condiciones</h3>
+
+        {% if cotizacion.observaciones %}
+            <p><strong>Observaciones:</strong> {{ cotizacion.observaciones }}</p>
+        {% endif %}
+
+        {% if cotizacion.condiciones %}
+            <p><strong>Condiciones:</strong> {{ cotizacion.condiciones }}</p>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}

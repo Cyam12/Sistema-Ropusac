@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Costos por Proveedor | ROPUSAC{% endblock %}
+
+{% block page_title %}Costos por Proveedor{% endblock %}
+
+{% block page_subtitle %}
+Compara los costos, disponibilidad y tiempos de entrega del producto.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>{{ producto.codigo }} - {{ producto.nombre }}</h3>
+
+            {% if producto.marca or producto.modelo %}
+                <p>{{ producto.marca or '' }} {{ producto.modelo or '' }}</p>
+            {% else %}
+                <p>Proveedores asociados al producto.</p>
+            {% endif %}
+        </div>
+
+        <div class="table-actions">
+            <a href="{{ url_for('admin.nuevo_producto_proveedor', producto_id=producto.id) }}" class="btn-primary">
+                Asociar proveedor
+            </a>
+
+            <a href="{{ url_for('admin.productos') }}" class="btn-secondary">
+                Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Proveedor</th>
+                    <th>RUC</th>
+                    <th>Código proveedor</th>
+                    <th>Costo actual</th>
+                    <th>Precio anterior</th>
+                    <th>Disponibilidad</th>
+                    <th>Entrega</th>
+                    <th>Actualización</th>
+                    <th>Estado</th>
+                    <th>Observación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if proveedores_producto %}
+                    {% for item in proveedores_producto %}
+                        <tr>
+                            <td><strong>{{ item.proveedor }}</strong></td>
+                            <td>{{ item.ruc or '-' }}</td>
+                            <td>{{ item.codigo_proveedor or '-' }}</td>
+                            <td>S/ {{ "%.2f"|format(item.costo_unitario) }}</td>
+
+                            <td>
+                                {% if item.precio_anterior %}
+                                    S/ {{ "%.2f"|format(item.precio_anterior) }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if item.disponibilidad == 'disponible' %}
+                                    <span class="badge badge-success">Disponible</span>
+                                {% elif item.disponibilidad == 'bajo_stock' %}
+                                    <span class="badge badge-warning">Bajo stock</span>
+                                {% elif item.disponibilidad == 'agotado' %}
+                                    <span class="badge badge-danger">Agotado</span>
+                                {% else %}
+                                    <span class="badge badge-info">Por confirmar</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ item.tiempo_entrega_dias }} días</td>
+                            <td>{{ item.fecha_actualizacion }}</td>
+
+                            <td>
+                                {% if item.estado == 'activo' %}
+                                    <span class="badge badge-success">Activo</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Inactivo</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ item.observacion or '-' }}</td>
+
+                            <td>
+                                <div class="table-actions">
+                                    <a href="{{ url_for('admin.editar_producto_proveedor', producto_id=producto.id, relacion_id=item.id) }}" class="btn-small">
+                                        Editar
+                                    </a>
+
+                                    <form method="POST"
+                                          action="{{ url_for('admin.eliminar_producto_proveedor', producto_id=producto.id, relacion_id=item.id) }}"
+                                          class="inline-form"
+                                          onsubmit="return confirm('¿Seguro que deseas retirar este proveedor del producto?');">
+                                        <button type="submit" class="btn-small btn-danger">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="11" class="text-center">
+                            Este producto aún no tiene proveedores asociados.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

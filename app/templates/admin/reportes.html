@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes | ROPUSAC{% endblock %}
+
+{% block page_title %}Reportes Administrativos{% endblock %}
+
+{% block page_subtitle %}
+Análisis de ventas, cotizaciones, márgenes, vendedores, productos y proveedores.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Filtros del reporte</h3>
+            <p>Filtra los indicadores por rango de fechas.</p>
+        </div>
+
+        <a 
+            href="{{ url_for('admin.exportar_reporte_cotizaciones_csv', fecha_inicio=filtros.fecha_inicio, fecha_fin=filtros.fecha_fin) }}" 
+            class="btn-primary"
+        >
+            Exportar CSV
+        </a>
+    </div>
+
+    <form method="GET" action="{{ url_for('admin.reportes') }}" class="form-grid filter-grid">
+
+        <div class="form-group">
+            <label>Fecha inicio</label>
+            <input type="date" name="fecha_inicio" value="{{ filtros.fecha_inicio }}">
+        </div>
+
+        <div class="form-group">
+            <label>Fecha fin</label>
+            <input type="date" name="fecha_fin" value="{{ filtros.fecha_fin }}">
+        </div>
+
+        <div class="form-actions filter-actions">
+            <button type="submit" class="btn-primary">Filtrar</button>
+            <a href="{{ url_for('admin.reportes') }}" class="btn-secondary">Limpiar</a>
+        </div>
+
+    </form>
+
+</div>
+
+<div class="cards-grid">
+
+    <div class="card">
+        <span>Total cotizaciones</span>
+        <h2>{{ resumen.total_cotizaciones }}</h2>
+        <p>Cotizaciones registradas en el rango</p>
+    </div>
+
+    <div class="card">
+        <span>Total cotizado</span>
+        <h2>S/ {{ "%.2f"|format(resumen.total_cotizado) }}</h2>
+        <p>Monto total cotizado</p>
+    </div>
+
+    <div class="card">
+        <span>Ventas cerradas</span>
+        <h2>S/ {{ "%.2f"|format(resumen.ventas_cerradas) }}</h2>
+        <p>Cotizaciones cerradas como venta</p>
+    </div>
+
+    <div class="card">
+        <span>Total costos</span>
+        <h2>S/ {{ "%.2f"|format(resumen.total_costos) }}</h2>
+        <p>Costo total estimado</p>
+    </div>
+
+    <div class="card">
+        <span>Margen total</span>
+        <h2>S/ {{ "%.2f"|format(resumen.total_margen) }}</h2>
+        <p>Margen acumulado de cotizaciones</p>
+    </div>
+
+    <div class="card">
+        <span>Margen cerrado</span>
+        <h2>S/ {{ "%.2f"|format(resumen.margen_cerrado) }}</h2>
+        <p>Margen de cotizaciones cerradas</p>
+    </div>
+
+    <div class="card">
+        <span>Margen promedio</span>
+        <h2>{{ "%.2f"|format(resumen.margen_promedio) }}%</h2>
+        <p>Promedio general de margen</p>
+    </div>
+
+</div>
+
+<div class="report-grid">
+
+    <div class="panel">
+        <h3>Cotizaciones por estado</h3>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Estado</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% if cotizaciones_estado %}
+                        {% for item in cotizaciones_estado %}
+                            <tr>
+                                <td>
+                                    {% if item.estado == 'borrador' %}
+                                        <span class="badge badge-info">Borrador</span>
+                                    {% elif item.estado == 'pendiente' %}
+                                        <span class="badge badge-warning">Pendiente</span>
+                                    {% elif item.estado == 'aprobada' %}
+                                        <span class="badge badge-success">Aprobada</span>
+                                    {% elif item.estado == 'cerrada' %}
+                                        <span class="badge badge-success">Cerrada</span>
+                                    {% elif item.estado == 'rechazada' %}
+                                        <span class="badge badge-danger">Rechazada</span>
+                                    {% else %}
+                                        <span class="badge badge-warning">{{ item.estado|capitalize }}</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>{{ item.cantidad }}</td>
+                                <td>S/ {{ "%.2f"|format(item.total) }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center">Sin datos.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3>Top vendedores</h3>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Vendedor</th>
+                        <th>Cotizaciones</th>
+                        <th>Total cotizado</th>
+                        <th>Ventas cerradas</th>
+                        <th>Margen</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% if top_vendedores %}
+                        {% for item in top_vendedores %}
+                            <tr>
+                                <td><strong>{{ item.vendedor }}</strong></td>
+                                <td>{{ item.total_cotizaciones }}</td>
+                                <td>S/ {{ "%.2f"|format(item.total_cotizado) }}</td>
+                                <td>S/ {{ "%.2f"|format(item.ventas_cerradas) }}</td>
+                                <td>S/ {{ "%.2f"|format(item.margen_total) }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Sin datos.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div class="panel">
+    <h3>Productos más cotizados</h3>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Código</th>
+                    <th>Cantidad cotizada</th>
+                    <th>Cotizaciones</th>
+                    <th>Venta total</th>
+                    <th>Margen</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if productos_cotizados %}
+                    {% for item in productos_cotizados %}
+                        <tr>
+                            <td><strong>{{ item.producto }}</strong></td>
+                            <td>{{ item.codigo_producto or '-' }}</td>
+                            <td>{{ "%.2f"|format(item.cantidad_total) }}</td>
+                            <td>{{ item.total_cotizaciones }}</td>
+                            <td>S/ {{ "%.2f"|format(item.venta_total) }}</td>
+                            <td>S/ {{ "%.2f"|format(item.margen_total) }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Sin productos cotizados.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel">
+    <h3>Productos con mayor margen</h3>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Código</th>
+                    <th>Venta total</th>
+                    <th>Costo total</th>
+                    <th>Margen total</th>
+                    <th>% Margen</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if margenes_productos %}
+                    {% for item in margenes_productos %}
+                        <tr>
+                            <td><strong>{{ item.producto }}</strong></td>
+                            <td>{{ item.codigo_producto or '-' }}</td>
+                            <td>S/ {{ "%.2f"|format(item.venta_total) }}</td>
+                            <td>S/ {{ "%.2f"|format(item.costo_total) }}</td>
+                            <td>S/ {{ "%.2f"|format(item.margen_total) }}</td>
+                            <td>{{ "%.2f"|format(item.margen_porcentaje) }}%</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Sin datos de margen.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel">
+    <h3>Clientes con mayor monto cotizado</h3>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Documento</th>
+                    <th>Cotizaciones</th>
+                    <th>Total cotizado</th>
+                    <th>Margen</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if top_clientes %}
+                    {% for item in top_clientes %}
+                        <tr>
+                            <td><strong>{{ item.cliente }}</strong></td>
+                            <td>{{ item.numero_documento or '-' }}</td>
+                            <td>{{ item.total_cotizaciones }}</td>
+                            <td>S/ {{ "%.2f"|format(item.total_cotizado) }}</td>
+                            <td>S/ {{ "%.2f"|format(item.margen_total) }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Sin datos de clientes.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel">
+    <h3>Comparación de costos por proveedor</h3>
+    <p class="text-muted">Muestra los costos registrados por producto y proveedor.</p>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Código</th>
+                    <th>Categoría</th>
+                    <th>Proveedor</th>
+                    <th>Costo actual</th>
+                    <th>Precio anterior</th>
+                    <th>Disponibilidad</th>
+                    <th>Entrega</th>
+                    <th>Actualización</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if comparacion_proveedores %}
+                    {% for item in comparacion_proveedores %}
+                        <tr>
+                            <td><strong>{{ item.producto }}</strong></td>
+                            <td>{{ item.codigo_producto }}</td>
+                            <td>{{ item.categoria or '-' }}</td>
+                            <td>{{ item.proveedor }}</td>
+                            <td>S/ {{ "%.2f"|format(item.costo_unitario) }}</td>
+
+                            <td>
+                                {% if item.precio_anterior %}
+                                    S/ {{ "%.2f"|format(item.precio_anterior) }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if item.disponibilidad == 'disponible' %}
+                                    <span class="badge badge-success">Disponible</span>
+                                {% elif item.disponibilidad == 'bajo_stock' %}
+                                    <span class="badge badge-warning">Bajo stock</span>
+                                {% elif item.disponibilidad == 'agotado' %}
+                                    <span class="badge badge-danger">Agotado</span>
+                                {% else %}
+                                    <span class="badge badge-info">Por confirmar</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ item.tiempo_entrega_dias }} días</td>
+                            <td>{{ item.fecha_actualizacion }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            No hay costos por proveedor registrados.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

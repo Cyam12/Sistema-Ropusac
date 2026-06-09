@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Cliente | ROPUSAC{% endblock %}
+
+{% block page_title %}Editar Cliente{% endblock %}
+
+{% block page_subtitle %}
+Actualiza la información comercial del cliente.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Editar cliente</h3>
+            <p>Modifica los datos del cliente seleccionado.</p>
+        </div>
+
+        <a href="{{ url_for('admin.clientes') }}" class="btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.editar_cliente', cliente_id=cliente.id) }}" class="form-grid">
+
+        <div class="form-group">
+            <label>Tipo de documento *</label>
+            <select name="tipo_documento" required>
+                <option value="RUC" {% if cliente.tipo_documento == 'RUC' %}selected{% endif %}>RUC</option>
+                <option value="DNI" {% if cliente.tipo_documento == 'DNI' %}selected{% endif %}>DNI</option>
+                <option value="CE" {% if cliente.tipo_documento == 'CE' %}selected{% endif %}>CE</option>
+                <option value="SIN_DOCUMENTO" {% if cliente.tipo_documento == 'SIN_DOCUMENTO' %}selected{% endif %}>Sin documento</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Número de documento</label>
+            <input type="text" name="numero_documento" value="{{ cliente.numero_documento or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Razón social / Nombre *</label>
+            <input type="text" name="razon_social" value="{{ cliente.razon_social }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre comercial</label>
+            <input type="text" name="nombre_comercial" value="{{ cliente.nombre_comercial or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Contacto</label>
+            <input type="text" name="contacto" value="{{ cliente.contacto or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" name="telefono" value="{{ cliente.telefono or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Correo electrónico</label>
+            <input type="email" name="email" value="{{ cliente.email or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Estado *</label>
+            <select name="estado" required>
+                <option value="activo" {% if cliente.estado == 'activo' %}selected{% endif %}>Activo</option>
+                <option value="inactivo" {% if cliente.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Dirección</label>
+            <input type="text" name="direccion" value="{{ cliente.direccion or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Distrito</label>
+            <input type="text" name="distrito" value="{{ cliente.distrito or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Provincia</label>
+            <input type="text" name="provincia" value="{{ cliente.provincia or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Departamento</label>
+            <input type="text" name="departamento" value="{{ cliente.departamento or '' }}">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Actualizar cliente</button>
+            <a href="{{ url_for('admin.clientes') }}" class="btn-secondary">Cancelar</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

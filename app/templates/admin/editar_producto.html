@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Producto | ROPUSAC{% endblock %}
+
+{% block page_title %}Editar Producto{% endblock %}
+
+{% block page_subtitle %}
+Actualiza los datos principales del producto.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Editar producto</h3>
+            <p>Modifica la información del producto seleccionado.</p>
+        </div>
+
+        <a href="{{ url_for('admin.productos') }}" class="btn-secondary">
+            Volver
+        </a>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.editar_producto', producto_id=producto.id) }}" class="form-grid">
+
+        <div class="form-group">
+            <label>Categoría</label>
+            <select name="categoria_id">
+                <option value="">Sin categoría</option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}" {% if producto.categoria_id == categoria.id %}selected{% endif %}>
+                        {{ categoria.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Unidad de medida</label>
+            <select name="unidad_id">
+                <option value="">Sin unidad</option>
+                {% for unidad in unidades %}
+                    <option value="{{ unidad.id }}" {% if producto.unidad_id == unidad.id %}selected{% endif %}>
+                        {{ unidad.nombre }} - {{ unidad.abreviatura }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Código *</label>
+            <input type="text" name="codigo" value="{{ producto.codigo }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre del producto *</label>
+            <input type="text" name="nombre" value="{{ producto.nombre }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Marca</label>
+            <input type="text" name="marca" value="{{ producto.marca or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Modelo</label>
+            <input type="text" name="modelo" value="{{ producto.modelo or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Precio venta sugerido *</label>
+            <input type="number" name="precio_venta_sugerido" step="0.01" min="0" value="{{ producto.precio_venta_sugerido }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Stock actual *</label>
+            <input type="number" name="stock_actual" step="0.01" min="0" value="{{ producto.stock_actual }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Stock mínimo *</label>
+            <input type="number" name="stock_minimo" step="0.01" min="0" value="{{ producto.stock_minimo }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Estado *</label>
+            <select name="estado" required>
+                <option value="activo" {% if producto.estado == 'activo' %}selected{% endif %}>Activo</option>
+                <option value="inactivo" {% if producto.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Descripción</label>
+            <textarea name="descripcion" rows="4">{{ producto.descripcion or '' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Actualizar producto</button>
+            <a href="{{ url_for('admin.productos') }}" class="btn-secondary">Cancelar</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

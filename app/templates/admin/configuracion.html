@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración | ROPUSAC{% endblock %}
+
+{% block page_title %}Configuración del Sistema{% endblock %}
+
+{% block page_subtitle %}
+Administra los parámetros generales, datos de empresa y configuración operativa.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Datos generales de la empresa</h3>
+            <p>Estos datos se usarán en cotizaciones, reportes y documentos generados.</p>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.actualizar_configuracion_general') }}" class="form-grid">
+
+        <div class="form-group">
+            <label>Nombre de la empresa *</label>
+            <input 
+                type="text" 
+                name="empresa_nombre" 
+                value="{{ config.get('empresa_nombre', 'ROPUSAC - Robinson Puse S.A.C.') }}"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label>RUC</label>
+            <input 
+                type="text" 
+                name="empresa_ruc" 
+                value="{{ config.get('empresa_ruc', '') }}"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Teléfono</label>
+            <input 
+                type="text" 
+                name="empresa_telefono" 
+                value="{{ config.get('empresa_telefono', '') }}"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Correo</label>
+            <input 
+                type="email" 
+                name="empresa_email" 
+                value="{{ config.get('empresa_email', '') }}"
+            >
+        </div>
+
+        <div class="form-group full-width">
+            <label>Dirección</label>
+            <input 
+                type="text" 
+                name="empresa_direccion" 
+                value="{{ config.get('empresa_direccion', '') }}"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>IGV (%) *</label>
+            <input 
+                type="number" 
+                name="igv_porcentaje" 
+                step="0.01" 
+                min="0"
+                value="{{ config.get('igv_porcentaje', '18') }}"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Moneda principal *</label>
+            <select name="moneda_principal" required>
+                <option value="PEN" {% if config.get('moneda_principal', 'PEN') == 'PEN' %}selected{% endif %}>Soles - PEN</option>
+                <option value="USD" {% if config.get('moneda_principal', 'PEN') == 'USD' %}selected{% endif %}>Dólares - USD</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Días de validez de cotización *</label>
+            <input 
+                type="number" 
+                name="dias_validez_cotizacion" 
+                min="0"
+                value="{{ config.get('dias_validez_cotizacion', '7') }}"
+                required
+            >
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                Guardar configuración
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Estado de base de datos</h3>
+            <p>Información de conexión actual. La contraseña no se muestra por seguridad.</p>
+        </div>
+    </div>
+
+    <div class="db-info-grid">
+
+        <div class="detail-box">
+            <span>Host</span>
+            <strong>{{ bd.host }}</strong>
+            <p>Servidor MySQL configurado</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Base de datos</span>
+            <strong>{{ bd.base_datos }}</strong>
+            <p>BD configurada en .env</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Usuario</span>
+            <strong>{{ bd.usuario }}</strong>
+            <p>Usuario de conexión</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Puerto</span>
+            <strong>{{ bd.puerto }}</strong>
+            <p>Puerto MySQL</p>
+        </div>
+
+        <div class="detail-box">
+            <span>BD actual</span>
+            <strong>{{ bd.base_datos_actual }}</strong>
+            <p>Base detectada por MySQL</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Versión MySQL</span>
+            <strong>{{ bd.version_mysql }}</strong>
+            <p>Versión del servidor</p>
+        </div>
+
+        <div class="detail-box">
+            <span>Tablas detectadas</span>
+            <strong>{{ bd.total_tablas }}</strong>
+            <p>Tablas en la base actual</p>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Parámetros del sistema</h3>
+            <p>Listado completo de configuraciones registradas.</p>
+        </div>
+
+        <a href="{{ url_for('admin.nueva_configuracion') }}" class="btn-primary">
+            Nueva configuración
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Clave</th>
+                    <th>Valor</th>
+                    <th>Descripción</th>
+                    <th>Actualizado</th>
+                    <th>Tipo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if configuraciones %}
+                    {% for item in configuraciones %}
+                        <tr>
+                            <td>
+                                <strong class="code-text">{{ item.clave }}</strong>
+                            </td>
+
+                            <td>{{ item.valor or '-' }}</td>
+                            <td>{{ item.descripcion or '-' }}</td>
+                            <td>{{ item.updated_at }}</td>
+
+                            <td>
+                                {% if item.clave in protegidas %}
+                                    <span class="badge badge-info">Principal</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Personalizada</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="table-actions">
+                                    <a href="{{ url_for('admin.editar_configuracion', configuracion_id=item.id) }}" class="btn-small">
+                                        Editar
+                                    </a>
+
+                                    {% if item.clave not in protegidas %}
+                                        <form method="POST"
+                                              action="{{ url_for('admin.eliminar_configuracion', configuracion_id=item.id) }}"
+                                              class="inline-form"
+                                              onsubmit="return confirm('¿Seguro que deseas eliminar esta configuración?');">
+                                            <button type="submit" class="btn-small btn-danger">
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="badge badge-info">Protegida</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            No hay configuraciones registradas.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Usuario | ROPUSAC{% endblock %}
+
+{% block page_title %}Editar Usuario{% endblock %}
+
+{% block page_subtitle %}
+Actualiza los datos, rol, estado o contraseña del usuario seleccionado.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Editar usuario</h3>
+            <p>Modifica la información del usuario del sistema.</p>
+        </div>
+
+        <a href="{{ url_for('admin.usuarios') }}" class="btn-secondary">Volver</a>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.editar_usuario', usuario_id=usuario.id) }}" class="form-grid">
+
+        <div class="form-group">
+            <label>Nombres *</label>
+            <input type="text" name="nombres" value="{{ usuario.nombres }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Apellidos *</label>
+            <input type="text" name="apellidos" value="{{ usuario.apellidos }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Correo electrónico *</label>
+            <input type="email" name="email" value="{{ usuario.email }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" name="telefono" value="{{ usuario.telefono or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Rol *</label>
+            <select name="rol_id" required>
+                <option value="">Seleccionar rol</option>
+
+                {% for rol in roles %}
+                    <option value="{{ rol.id }}" {% if rol.id == usuario.rol_id %}selected{% endif %}>
+                        {{ rol.nombre|capitalize }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Estado *</label>
+            <select name="estado" required>
+                <option value="activo" {% if usuario.estado == 'activo' %}selected{% endif %}>Activo</option>
+                <option value="inactivo" {% if usuario.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                <option value="bloqueado" {% if usuario.estado == 'bloqueado' %}selected{% endif %}>Bloqueado</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Nueva contraseña</label>
+            <input type="password" name="password" placeholder="Dejar vacío si no deseas cambiarla">
+        </div>
+
+        <div class="form-group">
+            <label>Confirmar nueva contraseña</label>
+            <input type="password" name="confirmar_password" placeholder="Repetir nueva contraseña">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Actualizar usuario</button>
+            <a href="{{ url_for('admin.usuarios') }}" class="btn-secondary">Cancelar</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

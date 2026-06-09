@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo | ROPUSAC{% endblock %}
+
+{% block page_title %}Catálogo de Productos{% endblock %}
+
+{% block page_subtitle %}
+Consulta productos, precios de venta, stock y disponibilidad para cotizar.
+{% endblock %}
+
+{% block content %}
+
+<div class="cards-grid">
+
+    <div class="card">
+        <span>Total productos</span>
+        <h2>{{ resumen.total_productos }}</h2>
+        <p>Productos activos encontrados</p>
+    </div>
+
+    <div class="card">
+        <span>Disponibles</span>
+        <h2>{{ resumen.disponibles }}</h2>
+        <p>Productos con stock suficiente</p>
+    </div>
+
+    <div class="card">
+        <span>Stock bajo</span>
+        <h2>{{ resumen.stock_bajo }}</h2>
+        <p>Productos cerca del mínimo</p>
+    </div>
+
+    <div class="card">
+        <span>Agotados</span>
+        <h2>{{ resumen.agotados }}</h2>
+        <p>Productos sin stock actual</p>
+    </div>
+
+</div>
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Productos disponibles</h3>
+            <p>Catálogo solo lectura para consulta comercial.</p>
+        </div>
+
+        <a href="{{ url_for('vendedor.nueva_cotizacion') }}" class="btn-primary">
+            Nueva cotización
+        </a>
+    </div>
+
+    <form method="GET" action="{{ url_for('vendedor.catalogo') }}" class="form-grid filter-grid">
+
+        <div class="form-group">
+            <label>Buscar producto</label>
+            <input 
+                type="text" 
+                name="buscar"
+                placeholder="Código, producto, marca, modelo o categoría"
+                value="{{ filtros.buscar }}"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Categoría</label>
+            <select name="categoria_id">
+                <option value="">Todas</option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}" {% if filtros.categoria_id|int == categoria.id %}selected{% endif %}>
+                        {{ categoria.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Stock</label>
+            <select name="stock">
+                <option value="">Todos</option>
+                <option value="disponible" {% if filtros.stock == 'disponible' %}selected{% endif %}>Disponible</option>
+                <option value="bajo" {% if filtros.stock == 'bajo' %}selected{% endif %}>Stock bajo</option>
+                <option value="agotado" {% if filtros.stock == 'agotado' %}selected{% endif %}>Agotado</option>
+            </select>
+        </div>
+
+        <div class="form-actions filter-actions">
+            <button type="submit" class="btn-primary">
+                Filtrar
+            </button>
+
+            <a href="{{ url_for('vendedor.catalogo') }}" class="btn-secondary">
+                Limpiar
+            </a>
+        </div>
+
+    </form>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Unidad</th>
+                    <th>Precio venta</th>
+                    <th>Stock</th>
+                    <th>Proveedor recomendado</th>
+                    <th>Disponibilidad</th>
+                    <th>Entrega</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if productos %}
+                    {% for producto in productos %}
+                        <tr>
+                            <td>
+                                <strong>{{ producto.codigo }}</strong>
+                            </td>
+
+                            <td>
+                                <strong>{{ producto.nombre }}</strong>
+
+                                {% if producto.marca or producto.modelo %}
+                                    <br>
+                                    <span class="text-muted">
+                                        {{ producto.marca or '' }} {{ producto.modelo or '' }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ producto.categoria or '-' }}</td>
+                            <td>{{ producto.unidad or '-' }}</td>
+                            <td>S/ {{ "%.2f"|format(producto.precio_venta_sugerido) }}</td>
+
+                            <td>
+                                {{ "%.2f"|format(producto.stock_actual) }}
+
+                                {% if producto.stock_actual == 0 %}
+                                    <br>
+                                    <span class="badge badge-danger">Agotado</span>
+                                {% elif producto.stock_actual <= producto.stock_minimo %}
+                                    <br>
+                                    <span class="badge badge-warning">Stock bajo</span>
+                                {% else %}
+                                    <br>
+                                    <span class="badge badge-success">Disponible</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ producto.proveedor_recomendado or '-' }}</td>
+
+                            <td>
+                                {% if producto.disponibilidad == 'disponible' %}
+                                    <span class="badge badge-success">Disponible</span>
+                                {% elif producto.disponibilidad == 'bajo_stock' %}
+                                    <span class="badge badge-warning">Bajo stock</span>
+                                {% elif producto.disponibilidad == 'agotado' %}
+                                    <span class="badge badge-danger">Agotado</span>
+                                {% elif producto.disponibilidad == 'por_confirmar' %}
+                                    <span class="badge badge-info">Por confirmar</span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if producto.tiempo_entrega_dias is not none %}
+                                    {{ producto.tiempo_entrega_dias }} días
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <a href="{{ url_for('vendedor.detalle_producto_catalogo', producto_id=producto.id) }}" class="btn-small">
+                                    Ver detalle
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center">
+                            No se encontraron productos con los filtros seleccionados.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

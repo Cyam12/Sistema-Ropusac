@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes | ROPUSAC{% endblock %}
+
+{% block page_title %}Gestión de Clientes{% endblock %}
+
+{% block page_subtitle %}
+Administra los clientes registrados para generar cotizaciones.
+{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h3>Clientes registrados</h3>
+            <p>Listado general de clientes del sistema.</p>
+        </div>
+
+        <a href="{{ url_for('admin.nuevo_cliente') }}" class="btn-primary">
+            Nuevo cliente
+        </a>
+    </div>
+
+    <form method="GET" action="{{ url_for('admin.clientes') }}" class="search-form">
+        <input 
+            type="text" 
+            name="buscar" 
+            placeholder="Buscar por razón social, documento, correo o teléfono"
+            value="{{ buscar }}"
+        >
+
+        <button type="submit" class="btn-primary">Buscar</button>
+
+        {% if buscar %}
+            <a href="{{ url_for('admin.clientes') }}" class="btn-secondary">
+                Limpiar
+            </a>
+        {% endif %}
+    </form>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Documento</th>
+                    <th>Cliente</th>
+                    <th>Contacto</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                    <th>Ubicación</th>
+                    <th>Estado</th>
+                    <th>Registrado por</th>
+                    <th>Fecha registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if clientes %}
+                    {% for cliente in clientes %}
+                        <tr>
+                            <td>{{ cliente.id }}</td>
+
+                            <td>
+                                <strong>{{ cliente.tipo_documento }}</strong><br>
+                                <span class="text-muted">
+                                    {{ cliente.numero_documento or '-' }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <strong>{{ cliente.razon_social }}</strong>
+
+                                {% if cliente.nombre_comercial %}
+                                    <br>
+                                    <span class="text-muted">
+                                        {{ cliente.nombre_comercial }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ cliente.contacto or '-' }}</td>
+                            <td>{{ cliente.telefono or '-' }}</td>
+                            <td>{{ cliente.email or '-' }}</td>
+
+                            <td>
+                                {% if cliente.distrito or cliente.provincia or cliente.departamento %}
+                                    {{ cliente.distrito or '' }}
+                                    {{ cliente.provincia or '' }}
+                                    {{ cliente.departamento or '' }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if cliente.estado == 'activo' %}
+                                    <span class="badge badge-success">Activo</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Inactivo</span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ cliente.creado_por_nombre or '-' }}</td>
+                            <td>{{ cliente.created_at }}</td>
+
+                            <td>
+                                <div class="table-actions">
+                                    <a href="{{ url_for('admin.editar_cliente', cliente_id=cliente.id) }}" class="btn-small">
+                                        Editar
+                                    </a>
+
+                                    <form method="POST"
+                                          action="{{ url_for('admin.eliminar_cliente', cliente_id=cliente.id) }}"
+                                          class="inline-form"
+                                          onsubmit="return confirm('¿Seguro que deseas eliminar este cliente? Si tiene cotizaciones, será marcado como inactivo.');">
+                                        <button type="submit" class="btn-small btn-danger">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="11" class="text-center">
+                            No hay clientes registrados.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

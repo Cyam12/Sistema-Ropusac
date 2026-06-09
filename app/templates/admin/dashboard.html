@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Administrador | ROPUSAC{% endblock %}
+
+{% block page_title %}Dashboard Administrador{% endblock %}
+
+{% block page_subtitle %}
+Resumen general de cotizaciones, ventas, márgenes y gestión comercial.
+{% endblock %}
+
+{% block content %}
+
+<div class="cards-grid">
+
+    <div class="card">
+        <span>Total de cotizaciones</span>
+        <h2>{{ metricas.total_cotizaciones }}</h2>
+        <p>Cotizaciones registradas en el sistema</p>
+    </div>
+
+    <div class="card">
+        <span>Cotizaciones pendientes</span>
+        <h2>{{ metricas.cotizaciones_pendientes }}</h2>
+        <p>Pendientes de aprobación o cierre</p>
+    </div>
+
+    <div class="card">
+        <span>Cotizaciones cerradas</span>
+        <h2>{{ metricas.cotizaciones_cerradas }}</h2>
+        <p>Cotizaciones concretadas como venta</p>
+    </div>
+
+    <div class="card">
+        <span>Ventas del mes</span>
+        <h2>S/ {{ "%.2f"|format(metricas.ventas_mes) }}</h2>
+        <p>Total vendido en el mes actual</p>
+    </div>
+
+    <div class="card">
+        <span>Margen del mes</span>
+        <h2>S/ {{ "%.2f"|format(metricas.margen_mes) }}</h2>
+        <p>Ganancia estimada del mes</p>
+    </div>
+
+    <div class="card">
+        <span>Clientes activos</span>
+        <h2>{{ metricas.total_clientes }}</h2>
+        <p>Clientes disponibles para cotizar</p>
+    </div>
+
+    <div class="card">
+        <span>Proveedores activos</span>
+        <h2>{{ metricas.total_proveedores }}</h2>
+        <p>Proveedores registrados</p>
+    </div>
+
+    <div class="card">
+        <span>Productos activos</span>
+        <h2>{{ metricas.total_productos }}</h2>
+        <p>Productos disponibles en catálogo</p>
+    </div>
+
+</div>
+
+<div class="panel">
+    <h3>Acciones rápidas</h3>
+
+    <div class="quick-actions">
+        <a href="#">Gestionar usuarios</a>
+        <a href="#">Registrar cliente</a>
+        <a href="#">Registrar proveedor</a>
+        <a href="#">Registrar producto</a>
+        <a href="#">Ver cotizaciones</a>
+        <a href="#">Ver reportes</a>
+    </div>
+</div>
+
+{% endblock %}

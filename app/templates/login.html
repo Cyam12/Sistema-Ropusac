@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | ROPUSAC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .login-card {
+            width: 380px;
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .login-card h1 {
+            margin: 0;
+            text-align: center;
+            color: #0f172a;
+            font-size: 26px;
+        }
+
+        .login-card p {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: #334155;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #0f766e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #115e59;
+        }
+
+        .alert {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .footer {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h1>ROPUSAC</h1>
+        <p>Sistema Web de Gestión de Cotizaciones</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <div class="form-group">
+                <label>Correo electrónico</label>
+                <input type="email" name="email" placeholder="admin@ropusac.com" required>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" name="password" placeholder="Ingresa tu contraseña" required>
+            </div>
+
+            <button type="submit">Iniciar sesión</button>
+        </form>
+
+        <div class="footer">
+            Robinson Puse S.A.C.
+        </div>
+    </div>
+
+</body>
+</html>
