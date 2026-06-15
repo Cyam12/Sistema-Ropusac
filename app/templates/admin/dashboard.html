@@ -66,12 +66,12 @@ Resumen general de cotizaciones, ventas, márgenes y gestión comercial.
     <h3>Acciones rápidas</h3>
 
     <div class="quick-actions">
-        <a href="#">Gestionar usuarios</a>
-        <a href="#">Registrar cliente</a>
-        <a href="#">Registrar proveedor</a>
-        <a href="#">Registrar producto</a>
-        <a href="#">Ver cotizaciones</a>
-        <a href="#">Ver reportes</a>
+        <a href="{{ url_for('admin.usuarios') }}">Gestionar usuarios</a>
+        <a href="{{ url_for('admin.clientes') }}">Registrar cliente</a>
+        <a href="{{ url_for('admin.proveedores') }}">Registrar proveedor</a>
+        <a href="{{ url_for('admin.productos') }}">Registrar producto</a>
+        <a href="{{ url_for('admin.cotizaciones') }}">Ver cotizaciones</a>
+        <a href="{{ url_for('admin.reportes') }}">Ver reportes</a>
     </div>
 </div>
 
